@@ -1,0 +1,78 @@
+Program->define-list
+define-list->define define-list
+define-list->$
+define->type ID define-type
+define-type->var-define-follow
+define-type->fun-define-follow
+var-define-follow->;
+var-define-follow->[ NUM ] ;
+type->int
+type->void
+type->char
+fun-define-follow->( params ) code-block
+params->params-list
+params->$
+params-list->param param-follow
+param-follow->, param param-follow
+param-follow->$
+param->type ID
+code-block->{ local-define-list code-list }
+local-define-list->local-var-define local-define-list
+local-define-list->$
+local-var-define->type ID var-define-follow
+code-list->code code-list
+code-list->$
+code->normal-statement
+code->selection-statement
+code->iteration-statement
+code->return-statement
+normal-statement->;
+normal-statement->ID normal-statement-follow
+normal-statement-follow->var-follow = expression ;
+normal-statement-follow->call-follow ;
+call-follow->( call-params )
+call-params->call-param-list
+call-params->$
+call-param-list->expression call-param-follow
+call-param-follow->, expression call-param-follow
+call-param-follow->$
+selection-statement->if ( expression ) { code-list } selection-follow
+selection-follow->else { code-list }
+selection-follow->$
+iteration-statement->while ( expression ) iteration-follow
+iteration-follow->{ code-list }
+iteration-follow->code
+return-statement->return return-follow
+return-follow->;
+return-follow->expression ;
+var-follow->[ expression ]
+var-follow->$
+expression->additive-expr expression-follow
+expression-follow->rel-op additive-expr
+expression-follow->$
+rel-op-><=
+rel-op-><
+rel-op->>
+rel-op->>=
+rel-op->==
+rel-op->!=
+additive-expr->term additive-expr-follow
+additive-expr-follow->add-op term additive-expr-follow
+additive-expr-follow->$
+add-op->+
+add-op->-
+term->factor term-follow
+term-follow->mul-op factor term-follow
+term-follow->$
+mul-op->*
+mul-op->/
+factor->( expression )
+factor->ID id-factor-follow
+factor->NUM
+id-factor-follow->var-follow
+id-factor-follow->( args )
+args->arg-list
+args->$
+arg-list->expression arg-list-follow
+arg-list-follow->, expression arg-list-follow
+arg-list-follow->$

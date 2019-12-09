@@ -1,0 +1,57 @@
+Type->int
+Type->void
+Type->float
+Type->char
+Program->Funcs
+Funcs->Type ID ( FormalParameters ) { FuncBody } Funcs
+Funcs->$
+FormalParameters->Type ID
+FormalParameters->Type ID , FormalParameters
+FormalParameters->$
+FuncBody->ApplicationVariables ProcessingStatement
+ApplicationVariables->Type ID ; ApplicationVariablesR
+ApplicationVariablesR->ApplicationVariables
+ApplicationVariablesR->$
+Type->int
+Type->float
+Type->char
+ProcessingStatement->Processing ProcessingStatementR
+Processing->Assignment
+Processing->Judgement
+Processing->Loop
+Processing->CallFunc
+ProcessingStatementR->ProcessingStatement
+ProcessingStatementR->$
+Assignment->ID = Operation ;
+Operation->T A
+A->M T A
+A->$
+T->F B
+B->N F B
+B->$
+F->ID
+F->NUM
+F->( Operation )
+M->+
+M->-
+N->*
+N->/
+Judgement->if ( JudgeCondition ) { JudgeBody } JudgementFollow
+JudgeBody->ProcessingStatement
+JudgeBody->$
+JudgeCondition->Operation JudgeConditionFollow
+JudgeConditionFollow->Compare Operation
+JudgeConditionFollow->$
+Compare-><
+Compare->>
+Compare->==
+Compare-><=
+Compare->>=
+Compare->!=
+JudgementFollow->$
+JudgementFollow->else { JudgeBody }
+JudgementFollow->else if ( JudgeCondition ) { JudgeBody } JudgementFollowR
+JudgementFollowR->JudgementFollow
+JudgementFollowR->$
+Loop->while ( Judgement ) { JudgeBody }
+CallFunc->$

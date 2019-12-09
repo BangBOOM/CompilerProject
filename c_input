@@ -1,0 +1,23 @@
+int main(){
+    int d;
+    d=(1+2)/3;
+    if(d>0)
+    {
+        d=0-d;
+    }
+    elif (d>0){
+        d=12;
+    }
+    elif (d>0){
+        d=12;
+    }
+    else{
+        d=13;
+    }
+}
+
+int tmp(){
+    int c;
+    c=(10-2)/2;
+    return c;
+}

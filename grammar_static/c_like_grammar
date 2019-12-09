@@ -1,0 +1,52 @@
+Program->Funcs
+Funcs->Type ID ( FormalParameters ) { CodeBody } Funcs
+Funcs->$
+FormalParameters->Type ID FormalParameters
+FormalParameters->, Type ID FormalParameters
+FormalParameters->$
+Type->int
+Type->void
+Type->float
+Type->char
+CodeBody->$
+CodeBody->LocalDefineList CodeList
+LocalDefineList->LocalVarDefine LocalDefineList
+LocalDefineList->$
+LocalVarDefine->Type ID ;
+CodeList->Code CodeList
+CodeList->$
+Code->NormalStatement
+NormalStatement->ID NormalStatementFollow
+NormalStatementFollow->= Operation ;
+Operation->T A
+A->M T A
+A->$
+T->F B
+B->N F B
+B->$
+F->ID
+F->NUM
+F->( Operation )
+M->+
+M->-
+N->*
+N->/
+Code->IfStatement
+IfStatement->if ( JudgeStatement ) { CodeBody } IFStatementFollow
+IFStatementFollow->$
+IFStatementFollow->ElseIFPart ElsePart
+ElsePart->$
+ElsePart->else { CodeBody }
+ElseIFPart->elif ( JudgeStatement ) { CodeBody } ElseIFPart
+ElseIFPart->$
+JudgeStatement->Operation JudgeStatementFollow
+JudgeStatementFollow->CompareSymbol Operation
+JudgeStatementFollow->$
+CompareSymbol->==
+CompareSymbol-><=
+CompareSymbol->>=
+CompareSymbol-><
+CompareSymbol->>
+Code->LoopStatement
+LoopStatement->while ( JudgeStatement ) { CodeBody }
+Code->return Operation ;
