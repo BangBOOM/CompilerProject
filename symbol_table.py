@@ -17,7 +17,8 @@ class Fun:
 
 
 class SYN:
-    DIC_SYN={}
+    Funs=[]
+    FunsName=[]
 
 
 

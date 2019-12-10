@@ -4,8 +4,8 @@ int tmp(int a){
     return c;
 }
 int main(){
-    int d;
-    d=(1+2)/3;
+    int d$;
+    d=(1+2)/2;
     if(d>0)
     {
         int x;

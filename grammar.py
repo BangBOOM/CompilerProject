@@ -144,9 +144,16 @@ class LL1(GrammarParser):
         pass
 
     def analyzeInputString(self):
+        def getTokenVal(token):
+            if token.type == 'con':
+                return 'NUM'
+            if token.type == 'i':
+                return 'ID'
+            return token.val
         stack=['#',self.Z]
-        strList=copy.copy(self.INPUT_L)
-        w=strList.pop(0)
+        TokenList=copy.copy(self.RES_TOKEN)
+        token=TokenList.pop(0)
+        w=getTokenVal(token)
         while stack:
             x=stack.pop()
             if x!=w:
@@ -157,7 +164,6 @@ class LL1(GrammarParser):
                 if id==-1:
                     print(x,w)
                     print('stack:',stack)
-                    print('strlist:',strList)
                     return "error2" #这个位置中止整个程序返回报错信息
                 tmp=self.P_LIST[id][1]
                 if tmp!=['$']:
@@ -166,7 +172,11 @@ class LL1(GrammarParser):
             else:
                 if w=='#':
                     return "acc"
-                w=strList.pop(0)
+                try:
+                    token=TokenList.pop(0)
+                    w=getTokenVal(token)
+                except: #TokenList变为空
+                    w='#'
         return "error3"
 
 if __name__ == "__main__":
