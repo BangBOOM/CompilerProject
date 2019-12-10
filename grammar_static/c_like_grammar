@@ -50,3 +50,12 @@ CompareSymbol->>
 Code->LoopStatement
 LoopStatement->while ( JudgeStatement ) { CodeBody }
 Code->return Operation ;
+Code->FuncCall
+FuncCall->FUN ID FuncCallFollow ;
+FuncCallFollow->= ID ( Args )
+FuncCallFollow->( Args )
+Args->arg Args
+Args->, arg Args
+Args->$
+arg->ID
+arg->NUM

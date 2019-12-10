@@ -21,6 +21,8 @@
 | ElseIFPart | else if | VN |
 | CompareSymbol | 比较符号 | VN |
 | LoopStatement | 循环语句 | VN |
+| FuncCall | 函数调用 | VN |
+| Args| 参数 | VN|
 
 ## Main Function
 + 函数定义

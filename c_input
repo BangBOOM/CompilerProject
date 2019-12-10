@@ -1,11 +1,18 @@
+int tmp(int a){
+    int c;
+    c=(10-2)/2;
+    return c;
+}
 int main(){
     int d;
     d=(1+2)/3;
     if(d>0)
     {
+        int x;
         d=0-d;
     }
     elif (d>0){
+        int c;
         d=12;
     }
     elif (d>0){
@@ -14,10 +21,6 @@ int main(){
     else{
         d=13;
     }
-}
-
-int tmp(){
-    int c;
-    c=(10-2)/2;
-    return c;
+    FUN tmp(d);
+    FUN t=tmp(d);
 }
