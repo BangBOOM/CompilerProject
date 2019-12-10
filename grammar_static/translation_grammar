@@ -17,21 +17,21 @@ LocalVarDefine->Type ID ;
 CodeList->Code CodeList
 CodeList->$
 Code->NormalStatement
-NormalStatement->ID NormalStatementFollow
-NormalStatementFollow->= Operation ;
+NormalStatement->ID @PUSH_VAL NormalStatementFollow
+NormalStatementFollow->= @SAVE_= Operation @GEQ_G ;
 Operation->T A
-A->M T A
+A->M T @GEQ_G A
 A->$
 T->F B
-B->N F B
+B->N F @GEQ_G B
 B->$
-F->ID
-F->NUM
+F->ID @PUSH_VAL
+F->NUM @PUSH_VAL
 F->( Operation )
-M->+
-M->-
-N->*
-N->/
+M->+ @SAVE_+
+M->- @SAVE_-
+N->* @SAVE_*
+N->/ @SAVE_/
 Code->IfStatement
 IfStatement->if ( JudgeStatement ) { CodeBody } IFStatementFollow
 IFStatementFollow->$
@@ -41,13 +41,13 @@ ElsePart->else { CodeBody }
 ElseIFPart->elif ( JudgeStatement ) { CodeBody } ElseIFPart
 ElseIFPart->$
 JudgeStatement->Operation JudgeStatementFollow
-JudgeStatementFollow->CompareSymbol Operation
+JudgeStatementFollow->CompareSymbol Operation @GEQ_G
 JudgeStatementFollow->$
-CompareSymbol->==
-CompareSymbol-><=
-CompareSymbol->>=
-CompareSymbol-><
-CompareSymbol->>
+CompareSymbol->== @SAVE_==
+CompareSymbol-><= @SAVE_<=
+CompareSymbol->>= @SAVE_>=
+CompareSymbol->< @SAVE_<
+CompareSymbol->> @SAVE_>
 Code->LoopStatement
 LoopStatement->while ( JudgeStatement ) { CodeBody }
 Code->return Operation ;

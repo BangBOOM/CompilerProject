@@ -33,3 +33,7 @@
 + 一个函数为一个模块不可以在函数之外声明语句
 + 考虑添加全局Global Variables模块
 + 支持int,float,char类型不支持数组
++ 函数传参不支持算术表达式
+
+## Translation Grammar
++ 翻译文法用于翻译一整个函数，基于LL1文法添加语义

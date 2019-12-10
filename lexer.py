@@ -15,7 +15,12 @@ class Lexer:
     TokenList = []
     CUR_ROW = -1
     CUR_LINE = 0
-    Token = namedtuple('Token', 'type index val cur_line')  # 具名元组表示
+    id=-1
+    Token = namedtuple('Token', 'type index val cur_line id')  # 具名元组表示
+
+    def __incId(self):
+        self.id+=1
+        return self.id
 
     def __init__(self):
         path1 = os.path.abspath('lexer_static/keyword_list')
@@ -30,16 +35,15 @@ class Lexer:
             for i, item in enumerate(f.readlines()):
                 item = item.strip()
                 self.p_list.append(item)
-
-    def dict_for_search(self):  # 这个是为了方便检索，其实是设计结构上的一个失误添加的这个
-        self.DICT_S = {
-            'k': list(self.DICT['k']),
-            'p': list(self.DICT['p']),
-            'con': list(self.DICT['con']),
-            'c': list(self.DICT['c']),
-            's': list(self.DICT['s']),
-            'i': list(self.DICT['i']),
-        }
+    # def dict_for_search(self):  # 这个是为了方便检索，其实是设计结构上的一个失误添加的这个,修改了token序列的属性在其中加入了val后这部分就不需要了
+    #     self.DICT_S = {
+    #         'k': list(self.DICT['k']),
+    #         'p': list(self.DICT['p']),
+    #         'con': list(self.DICT['con']),
+    #         'c': list(self.DICT['c']),
+    #         's': list(self.DICT['s']),
+    #         'i': list(self.DICT['i']),
+    #     }
 
     def getInput(self, input_list):
         '''
@@ -123,7 +127,6 @@ class Lexer:
             typ = 'c'
         else:
             item_next = self.getNextChar()
-
             if item + item_next in self.p_list:
                 demo = item + item_next
                 id = self.__getId(demo, 'p')
@@ -132,7 +135,7 @@ class Lexer:
                 id = self.__getId(demo, 'p')
                 self.backOneStep()
             typ = 'p'
-        return self.Token(typ, id, demo, self.CUR_LINE)
+        return self.Token(typ, id, demo, self.CUR_LINE,self.__incId())
 
     def analyse(self):
         TOKEN_LIST = []
@@ -142,14 +145,14 @@ class Lexer:
                 break
             if tmp:
                 TOKEN_LIST.append(tmp)
-        self.dict_for_search()
+        # self.dict_for_search()
         self.TokenList = TOKEN_LIST
         return TOKEN_LIST
 
 
 if __name__ == "__main__":
     lex = Lexer()
-    # INPUT=input("input something:").split('\n')         #sample INPUT=['int a=0;','a=a+4;','c='s'']
+    # INPUT=input("input something:").split('\n')         #sample INPUT=['int a=0;\n','a=a+4;\n','c='s'\n']
     INPUT = ['int a=0;\n', 'a=a+4;\n', 'c="ss"\n']
     lex.getInput(INPUT)
     res = lex.analyse()
