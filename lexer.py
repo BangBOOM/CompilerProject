@@ -127,7 +127,7 @@ class Lexer:
             if item + item_next in self.p_list:
                 demo = item + item_next
                 id = self.__getId(demo, 'p')
-            else:
+            elif item in self.p_list:
                 demo = item
                 id = self.__getId(demo, 'p')
                 self.backOneStep()
@@ -150,9 +150,13 @@ class Lexer:
 if __name__ == "__main__":
     lex = Lexer()
     # INPUT=input("input something:").split('\n')         #sample INPUT=['int a=0;','a=a+4;','c='s'']
-    INPUT = ['int a=0;', 'a=a+4;', 'c="ss"']
+    INPUT = ['int a=0;\n', 'a=a+4;\n', 'c="ss"\n']
     lex.getInput(INPUT)
     res = lex.analyse()
     for tmp in res:
         print(tmp)
     print(lex.DICT_S)
+
+'''
+这部分需要添加遇到非法符号报错，即遇到未出现在p_list中的符号终止程序返回错误信息
+'''

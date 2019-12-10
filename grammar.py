@@ -1,6 +1,6 @@
-import os
+import os,copy
+import symbol_table
 from lexer import Lexer
-import copy
 
 class GrammarParser:
     GRAMMAR_DICT = {}
@@ -152,13 +152,13 @@ class LL1(GrammarParser):
             if x!=w:
                 if x not in self.VN:
                     print(x)
-                    return "error1"
+                    return "error1" #这个位置中止整个程序返回报错信息
                 id=self.analysis_table[x][w]
                 if id==-1:
                     print(x,w)
                     print('stack:',stack)
                     print('strlist:',strList)
-                    return "error2"
+                    return "error2" #这个位置中止整个程序返回报错信息
                 tmp=self.P_LIST[id][1]
                 if tmp!=['$']:
                     tmp=list(tmp)
