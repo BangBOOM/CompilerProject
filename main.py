@@ -16,6 +16,8 @@ if __name__ == '__main__':
         for block in ll1.funcBlocks:
             res=qt.genQt(block)
             print(res)
+    else:
+        print(res)
 
 
 

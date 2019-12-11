@@ -1,4 +1,4 @@
-int tmp(int a){
+int tmp(int a,int b){
     int c;
     c=(10-2)/2;
     return c;

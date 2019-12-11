@@ -35,15 +35,6 @@ class Lexer:
             for i, item in enumerate(f.readlines()):
                 item = item.strip()
                 self.p_list.append(item)
-    # def dict_for_search(self):  # 这个是为了方便检索，其实是设计结构上的一个失误添加的这个,修改了token序列的属性在其中加入了val后这部分就不需要了
-    #     self.DICT_S = {
-    #         'k': list(self.DICT['k']),
-    #         'p': list(self.DICT['p']),
-    #         'con': list(self.DICT['con']),
-    #         'c': list(self.DICT['c']),
-    #         's': list(self.DICT['s']),
-    #         'i': list(self.DICT['i']),
-    #     }
 
     def getInput(self, input_list):
         '''
@@ -78,7 +69,7 @@ class Lexer:
         if item == '':
             return None
         elif item == "END":
-            return ("END")
+            return "END"
         elif item.isalpha() or item == '_':
             demo = ""
             while item.isalpha() or item.isdigit() or item == "_":
@@ -145,20 +136,17 @@ class Lexer:
                 break
             if tmp:
                 TOKEN_LIST.append(tmp)
-        # self.dict_for_search()
         self.TokenList = TOKEN_LIST
         return TOKEN_LIST
 
 
 if __name__ == "__main__":
     lex = Lexer()
-    # INPUT=input("input something:").split('\n')         #sample INPUT=['int a=0;\n','a=a+4;\n','c='s'\n']
     INPUT = ['int a=0;\n', 'a=a+4;\n', 'c="ss"\n']
     lex.getInput(INPUT)
     res = lex.analyse()
     for tmp in res:
         print(tmp)
-    print(lex.DICT_S)
 
 '''
 这部分需要添加遇到非法符号报错，即遇到未出现在p_list中的符号终止程序返回错误信息

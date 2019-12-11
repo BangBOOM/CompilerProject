@@ -1,5 +1,5 @@
-from grammarParaser import GrammarParser
 import os,copy,json
+from grammarParaser import GrammarParser
 
 class QtGen(GrammarParser): #四元式生成
     t_id=0
@@ -19,7 +19,7 @@ class QtGen(GrammarParser): #四元式生成
     def genQt(self,funcBlock):
         qtList=[]
         SEM_STACK=[]    #
-        SYMBOL_STACK=[] #语义信息对应的符号
+        SYMBOL_STACK=[] #语义符号栈
         SYN=['#',self.Z]
         TokenList=copy.copy(funcBlock)
         self.t_id=0
@@ -52,7 +52,7 @@ class QtGen(GrammarParser): #四元式生成
         val=None
         while SYN:
             x=SYN.pop()
-            if x[0] == '@':   #三种语义信息SAVE GEQ PUSH
+            if x[0] == '@':   #判断是三种语义信息SAVE GEQ PUSH而非VN
                 catch(x,val)
                 continue
             if x != w:

@@ -7,7 +7,7 @@ from grammarParaser import GrammarParser
 class LL1(GrammarParser):
     RES_TOKEN=[]
     syn_table=symbol_table.SYN()
-    funcBlocks=[]  #函数块
+    funcBlocks=[]  #函数块集合[[],[],[],...]
     def __init__(self,path,doseIniList=False):
         GrammarParser.__init__(self,path)
         self.lex=Lexer()
@@ -33,7 +33,7 @@ class LL1(GrammarParser):
         stack=['#',self.Z]
         TokenList=copy.copy(self.RES_TOKEN)
         token=TokenList.pop(0)
-        funcBlock = [token]  # 函数块每识别完成一个函数后送入函数四元式生成
+        funcBlock = [token]  # 函数块每识别完成一个函数后送入self.funcBlocks
         w=getTokenVal(token)
         while stack:
             x=stack.pop()
@@ -48,8 +48,14 @@ class LL1(GrammarParser):
                     return "error2" #这个位置中止整个程序返回报错信息
                 tmp=self.P_LIST[id][1]
                 if tmp!=['$']:
-                    if x=="Funcs":
-                        self.__AddFuncToSYN(token.id,token.cur_line)
+                    if x=="Funcs":  #函数定义
+                        self.__AddFuncToSYN(token)
+                    if x=="FormalParameters":   #函数形参
+                        self.__AddParaToFun(token,True)
+                    if x=="LocalDefineList":    #函数内变量定义
+                        self.__AddParaToFun(token,False)
+                    if x=="NormalStatement" or (x=="F" and w=='ID'):
+                        self.__checkNormalID(token)
                     tmp=list(tmp)
                     stack+=tmp[::-1]
             else:
@@ -67,6 +73,15 @@ class LL1(GrammarParser):
                     w='#'
         return "error3"
 
-    def __AddFuncToSYN(self,id,cur_line):
-        self.syn_table.addFunc(self.RES_TOKEN[id+1].val,self.RES_TOKEN[id].val,cur_line)
+    def __AddFuncToSYN(self,token): #添加函数到符号表的总表
+        self.syn_table.addFunc(self.RES_TOKEN[token.id+1].val,self.RES_TOKEN[token.id].val,token.cur_line)
+
+    def __AddParaToFun(self,token,dosIncPN): #添加形参到栈顶函数的变量信息
+        id = token.id
+        if token.val==',':
+            id+=1
+        self.syn_table.addParaToFun(self.RES_TOKEN[id+1].val,self.RES_TOKEN[id].val,token.cur_line,dosIncPN)
+
+    def __checkNormalID(self,token):
+        self.syn_table.checkFunParas(token.val,token.cur_line)
 
