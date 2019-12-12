@@ -3,23 +3,11 @@ int tmp(int a,int b){
     c=(10-2)/2;
     return c;
 }
-int main(){
+void main(){
     int d;
     d=(1+2)/2;
-    if(d>0)
-    {
-        int x;
-        d=0-d;
-    }
-    elif (d>0){
-        int c;
-        d=12;
-    }
-    elif (d>0){
-        d=12;
-    }
-    else{
-        d=13;
+    while(d>0){
+        d=d+1;
     }
     FUN tmp(d);
     FUN t=tmp(d);

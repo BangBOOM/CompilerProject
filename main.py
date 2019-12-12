@@ -14,12 +14,12 @@ if __name__ == '__main__':
     if res=='acc':
         qt=QtGen()
         for block in ll1.funcBlocks:
-            res=qt.genQt(block)
-            print(res)
+            qt_list=qt.genQt(block)
+            print("四元式：")
+            for item in qt_list:
+                print(item)
+            print('-'*25)
     else:
         print(res)
-
-
-
-
+    ll1.syn_table.showTheInfo()
 

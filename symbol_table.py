@@ -23,7 +23,6 @@ class Function:
         if doseParameter:                   #若是参数则在参数列表里添加
             self.typeOfParametersList.append(typ)
             self.numOfParameters+=1
-        # print(self.variableDict)
 
     def checkHasDefine(self,token):    #检查重复定义问题
         if token.val in list(self.variableDict.keys()):
@@ -31,7 +30,7 @@ class Function:
 
     def checkDoDefine(self,token):      #检查是变量否定义
         if token.val not in list(self.variableDict.keys()):
-            raise ValueError('error  variable has no definition in line ',token.cur_line+1,token.val)
+            raise ValueError('error variable has no definition in line ',token.cur_line+1,token.val)
 
 
 class SYMBOL:
@@ -53,7 +52,6 @@ class SYMBOL:
         function=Function(token.val,returnType,self.incCurAddr())
         self.functionList.append(function)
         self.functionNameList.append(token.val)
-        # print(self.functionNameList)
 
     def addVariableToFunction(self,token,varType,doseParameter=False):
         function=self.functionList[-1]
@@ -64,9 +62,14 @@ class SYMBOL:
         function.checkDoDefine(token)
 
     def checkDoDefineFunction(self,token):
-        print(self.functionNameList)
         if token.val not in self.functionNameList:
             raise ValueError('error variable duplicate definition in line ', token.cur_line + 1,token.val)
+
+    def showTheInfo(self):  #打印符号表的信息
+        for fun in self.functionList:
+            print("function: %s. ReturnType %s. ADDR %d. NumOfParameters %d."%(fun.functionName,fun.returnType,fun.addrOfFunction,fun.numOfParameters))
+            for _,v in fun.variableDict.items():
+                print("    variable: name %s type: %s addr: %s"%v)
 
 
 

@@ -36,16 +36,24 @@ class QtGen(GrammarParser): #四元式生成
             if deal=='@PUSH':
                 SEM_STACK.append(val)
             if deal=='@GEQ':
-                s=SYMBOL_STACK.pop()
-                tmp2=SEM_STACK.pop()
-                tmp1=SEM_STACK.pop()
-                if s=='=':
-                    qtList.append([s,tmp2,'_',tmp1])
+                if symbol=="el" or symbol=="ie" or symbol=="wh" or symbol=="we":
+                    qtList.append([symbol,'_','_','_'])
                 else:
-                    t='t'+str(self.t_id)
-                    self.t_id+=1
-                    SEM_STACK.append(t)
-                    qtList.append([s,tmp1,tmp2,t])
+                    s=SYMBOL_STACK.pop()
+                    if s=='=':
+                        tmp2 = SEM_STACK.pop()
+                        tmp1 = SEM_STACK.pop()
+                        qtList.append([s,tmp2,'_',tmp1])
+                    elif s=='if' or s=='elif' or s=='do':
+                        tmp=SEM_STACK.pop()
+                        qtList.append([s,tmp,'_','_'])
+                    else:
+                        tmp2 = SEM_STACK.pop()
+                        tmp1 = SEM_STACK.pop()
+                        t='t'+str(self.t_id)
+                        self.t_id+=1
+                        SEM_STACK.append(t)
+                        qtList.append([s,tmp1,tmp2,t])
 
         token=TokenList.pop(0)
         w=getTokenVal(token)

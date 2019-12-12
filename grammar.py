@@ -61,13 +61,11 @@ class LL1(GrammarParser):
                     if x=="NormalStatement" or (x=="F" and w=="ID" ):
                         self.__CheckVarToken(token)
                     if x=="FuncCallFollow":
-                        print(token)
                         id=token.id
                         if w=="=":
                             id+=1
                         else:
                             id-=1
-                        print("++",self.RES_TOKEN[id])
                         self.__CheckFunToken(self.RES_TOKEN[id])
 
             else:

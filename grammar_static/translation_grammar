@@ -33,12 +33,12 @@ M->- @SAVE_-
 N->* @SAVE_*
 N->/ @SAVE_/
 Code->IfStatement
-IfStatement->if ( JudgeStatement ) { CodeBody } IFStatementFollow
+IfStatement->if @SAVE_if ( JudgeStatement ) @GEQ_G { CodeBody } @GEQ_el IFStatementFollow @GEQ_ie
 IFStatementFollow->$
 IFStatementFollow->ElseIFPart ElsePart
 ElsePart->$
 ElsePart->else { CodeBody }
-ElseIFPart->elif ( JudgeStatement ) { CodeBody } ElseIFPart
+ElseIFPart->elif @SAVE_elif ( JudgeStatement ) @GEQ_G { CodeBody } @GEQ_el ElseIFPart
 ElseIFPart->$
 JudgeStatement->Operation JudgeStatementFollow
 JudgeStatementFollow->CompareSymbol Operation @GEQ_G
@@ -49,7 +49,7 @@ CompareSymbol->>= @SAVE_>=
 CompareSymbol->< @SAVE_<
 CompareSymbol->> @SAVE_>
 Code->LoopStatement
-LoopStatement->while ( JudgeStatement ) { CodeBody }
+LoopStatement->while @GEQ_wh @SAVE_do ( JudgeStatement ) @GEQ_G { CodeBody } @GEQ_we
 Code->return Operation ;
 Code->FuncCall
 FuncCall->FUN ID FuncCallFollow ;
