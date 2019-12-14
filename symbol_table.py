@@ -26,11 +26,13 @@ class Function:
 
     def checkHasDefine(self,token):    #检查重复定义问题
         if token.val in list(self.variableDict.keys()):
-            raise ValueError('error variable duplicate definition in line ',token.cur_line+1,token.val)
+            raise ValueError('error variable duplicate definition in line ',
+                             token.cur_line+1,token.val)
 
     def checkDoDefine(self,token):      #检查是变量否定义
         if token.val not in list(self.variableDict.keys()):
-            raise ValueError('error variable has no definition in line ',token.cur_line+1,token.val)
+            raise ValueError('error variable has no definition in line ',
+                             token.cur_line+1,token.val)
 
 
 class SYMBOL:
@@ -44,7 +46,8 @@ class SYMBOL:
 
     def checkHasDefine(self,token):
         if token.val in self.functionNameList:
-            raise ValueError('error variable duplicate definition in line ', token.cur_line + 1)
+            raise ValueError('error variable duplicate definition in line ',
+                             token.cur_line + 1)
 
 
     def addFunction(self,token,returnType):
@@ -63,11 +66,13 @@ class SYMBOL:
 
     def checkDoDefineFunction(self,token):
         if token.val not in self.functionNameList:
-            raise ValueError('error variable duplicate definition in line ', token.cur_line + 1,token.val)
+            raise ValueError('error variable duplicate definition in line ',
+                             token.cur_line + 1,token.val)
 
     def showTheInfo(self):  #打印符号表的信息
         for fun in self.functionList:
-            print("function: %s. ReturnType %s. ADDR %d. NumOfParameters %d."%(fun.functionName,fun.returnType,fun.addrOfFunction,fun.numOfParameters))
+            print("function: %s. ReturnType %s. ADDR %d. NumOfParameters %d."
+                  %(fun.functionName,fun.returnType,fun.addrOfFunction,fun.numOfParameters))
             for _,v in fun.variableDict.items():
                 print("    variable: name %s type: %s addr: %s"%v)
 

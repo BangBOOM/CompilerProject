@@ -18,7 +18,7 @@ class QtGen(GrammarParser): #四元式生成
 
     def genQt(self,funcBlock):
         qtList=[]
-        SEM_STACK=[]    #
+        SEM_STACK=[]
         SYMBOL_STACK=[] #语义符号栈
         SYN=['#',self.Z]
         TokenList=copy.copy(funcBlock)
@@ -40,11 +40,11 @@ class QtGen(GrammarParser): #四元式生成
                     qtList.append([symbol,'_','_','_'])
                 else:
                     s=SYMBOL_STACK.pop()
-                    if s=='=':
+                    if s=='=' or s=='callr':    #callr有返回值的函数调用,call无返回值的函数调用
                         tmp2 = SEM_STACK.pop()
                         tmp1 = SEM_STACK.pop()
                         qtList.append([s,tmp2,'_',tmp1])
-                    elif s=='if' or s=='elif' or s=='do':
+                    elif s in ['if','elif','do','FUN','return','push','call']:
                         tmp=SEM_STACK.pop()
                         qtList.append([s,tmp,'_','_'])
                     else:

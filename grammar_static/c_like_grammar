@@ -52,11 +52,9 @@ Code->LoopStatement
 LoopStatement->while ( JudgeStatement ) { CodeBody }
 Code->return Operation ;
 Code->FuncCall
-FuncCall->FUN ID FuncCallFollow ;
+FuncCall->CALL ID FuncCallFollow ;
 FuncCallFollow->= ID ( Args )
 FuncCallFollow->( Args )
-Args->arg Args
-Args->, arg Args
+Args->F Args
+Args->, F Args
 Args->$
-arg->ID
-arg->NUM

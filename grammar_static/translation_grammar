@@ -1,6 +1,6 @@
 Program->Funcs
 Funcs->FuncsHead { CodeBody } Funcs
-FuncsHead->Type ID ( FormalParameters )
+FuncsHead->Type ID @PUSH_VAL @SAVE_FUN @GEQ_G ( FormalParameters )
 Funcs->$
 FormalParameters->Type ID FormalParameters
 FormalParameters->, Type ID FormalParameters
@@ -50,13 +50,11 @@ CompareSymbol->< @SAVE_<
 CompareSymbol->> @SAVE_>
 Code->LoopStatement
 LoopStatement->while @GEQ_wh @SAVE_do ( JudgeStatement ) @GEQ_G { CodeBody } @GEQ_we
-Code->return Operation ;
+Code->return @SAVE_return Operation @GEQ_G ;
 Code->FuncCall
-FuncCall->FUN ID FuncCallFollow ;
-FuncCallFollow->= ID ( Args )
-FuncCallFollow->( Args )
-Args->arg Args
-Args->, arg Args
+FuncCall->CALL ID @PUSH_VAL FuncCallFollow ;
+FuncCallFollow->= ID @PUSH_VAL ( Args ) @SAVE_callr @GEQ_c1
+FuncCallFollow->( Args ) @SAVE_call @GEQ_c2
+Args->F @SAVE_push @GEQ_G Args
+Args->, F @SAVE_push @GEQ_G Args
 Args->$
-arg->ID
-arg->NUM

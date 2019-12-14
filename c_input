@@ -9,6 +9,15 @@ void main(){
     while(d>0){
         d=d+1;
     }
-    FUN tmp(d);
-    FUN t=tmp(d);
+    if(d<0){
+    d=d+1;
+    }
+    elif (d==0){
+    d=d-1;
+    }
+    else {
+    d=d+1;
+    }
+    CALL tmp(d,d);
+    CALL t=tmp();
 }
