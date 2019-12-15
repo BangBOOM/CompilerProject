@@ -1,23 +1,24 @@
 int tmp(int a,int b){
     int c;
-    c=(10-2)/2;
-    return c;
+    c=a+b;
+    return a;
 }
-void main(){
+int main(){
     int d;
-    d=(1+2)/2;
-    while(d>0){
+    int c;
+    d=2;
+    while(d<10){
         d=d+1;
     }
-    if(d<0){
-    d=d+1;
+    if(d>0){
+    c=d+2;
     }
     elif (d==0){
-    d=d-1;
+    c=d-1;
     }
     else {
-    d=d+1;
+    c=d+1;
     }
-    CALL tmp(d,d);
-    CALL t=tmp();
+    CALL c=tmp(c,d);
+    return 0;
 }

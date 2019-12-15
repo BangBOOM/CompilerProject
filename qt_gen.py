@@ -3,6 +3,7 @@ from grammarParaser import GrammarParser
 
 class QtGen(GrammarParser): #四元式生成
     t_id=0
+    qt_res=[]
     def __init__(self):
         GrammarParser.__init__(self)
         translation_grammar_path=os.path.abspath('grammar_static/translation_grammar')
@@ -18,7 +19,7 @@ class QtGen(GrammarParser): #四元式生成
 
     def genQt(self,funcBlock):
         qtList=[]
-        SEM_STACK=[]
+        SEM_STACK=[]    #
         SYMBOL_STACK=[] #语义符号栈
         SYN=['#',self.Z]
         TokenList=copy.copy(funcBlock)
@@ -50,7 +51,7 @@ class QtGen(GrammarParser): #四元式生成
                     else:
                         tmp2 = SEM_STACK.pop()
                         tmp1 = SEM_STACK.pop()
-                        t='t'+str(self.t_id)
+                        t='@t'+str(self.t_id)
                         self.t_id+=1
                         SEM_STACK.append(t)
                         qtList.append([s,tmp1,tmp2,t])
@@ -78,5 +79,10 @@ class QtGen(GrammarParser): #四元式生成
                     w = getTokenVal(token)
                 except:
                     w='#'
-        return qtList
+        self.qt_res.append(qtList)
+        # return qtList
+        # print("四元式：")
+        # for item in qtList:
+        #     print(item)
+        # print('-'*25)
 
