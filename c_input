@@ -1,7 +1,7 @@
 int tmp(int a,int b){
     int c;
     c=a+b;
-    return a;
+    return c;
 }
 int main(){
     int d;
@@ -11,7 +11,7 @@ int main(){
         d=d+1;
     }
     if(d>0){
-    c=d+2;
+        c=(d+2)/4;
     }
     elif (d==0){
     c=d-1;

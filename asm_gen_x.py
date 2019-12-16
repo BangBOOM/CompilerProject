@@ -7,11 +7,11 @@ class AsmCodeGen:
         '-':'SUB',
         '*':'MUL',
         '/':'DIV',
-        '<':'LT',
-        '>':'GT',
-        '>=':'GTE',
-        '<=':'LTE',
-        '==':'EQ',
+        '<':'JAE',
+        '>':'JBE',
+        '>=':'JB',
+        '<=':'JA',
+        '==':'JNE',
     }
     id=0
     def __init__(self,sym,allCode):
@@ -30,34 +30,43 @@ class AsmCodeGen:
         def LD(x):
             return "LD R,%s"%(x.val)
         def DOP(x,y):
-            return "%s R,%s"%(x,y.val)
+            if x.val in ['<','<=','>','>=','==']:
+                return ["CMP R,%s"%(y.val),"%s "%self.op2asm[x.val]]
+            else:
+                return ["%s R,%s"%(self.op2asm[x.val],y.val)]
         def ST(x):
             return "ST R,%s"%(x.val)
 
         asmCode=[]  #生成的目标代码
-        ifJumpStack=[]
+        startOfWhile=[]    #记录while语句开始地址
+        judgeOfWhile=[]     #记录while中判断句的位置待填写跳转信息
+        judgeOfIf=[]        #记录if判断句的位置待填写跳转信息
+        jmpToEnd=[]         #记录if跳转到结束的位置跳转信息待填
         for bloc in funcBlock:
             self.actInfoGen(bloc)
             RDL=None
             codes=[]
-            for item in bloc:
+            for i,item in enumerate(bloc):
                 if item[0].val in list(self.op2asm.keys()): #双目运算
-                    w=self.op2asm[item[0].val]
                     if RDL==None:
                         codes.append(LD(item[1]))
-                        codes.append(DOP(w,item[2]))
+                        codes+=DOP(item[0],item[2])
                     else:
                         if RDL.actInfo:
                             codes.append(ST(RDL))
-                        elif RDL==item[1]:
-                            codes.append(DOP(w,item[2]))
-                        elif RDL==item[2] and w in ['+','*','==']:
-                            codes.append(DOP(w,item[1]))
+                        if RDL==item[1]:
+                            codes+=DOP(item[0],item[2])
+                        elif RDL==item[2] and item[0].val in ['+','*','==']:
+                            codes+=DOP(item[0],item[1])
                         else:
                             codes.append(LD(item[1]))
-                            codes.append(DOP(w, item[2]))
+                            codes+=DOP(item[0], item[2])
+                    if item[0].val in  ['<','<=','>','>=','==']:
+                        if codes[0].startswith("while") :
+                            judgeOfWhile.append((len(asmCode),len(codes)-1))
+                        else:
+                            judgeOfIf.append((len(asmCode),len(codes)-1))
                     RDL=item[-1]
-
                 elif item[0].val=='=':
                     if RDL==None:
                         codes.append(LD(item[1]))
@@ -66,43 +75,66 @@ class AsmCodeGen:
                             codes.append(ST(RDL))
                         if RDL!=item[1] and RDL!=item[-1]:
                             codes.append(LD(item[1]))
-                    RDL=item[-1]
-
-                elif item[0].val=='if' or item[0].val=='elif' or item[0].val=='do':
-                    if RDL==None:
-                        codes.append(LD(item[1]))
-                    else:
-                        if RDL.actInfo:
-                            codes.append(ST(RDL))
-                        if RDL!=item[1]:
-                            codes.append(LD(item[1]))
-                    codes.append("FJ R,")
-                    ifJumpStack.append(len(codes) - 1)  # 将跳转指令的index传入
+                    codes.append(ST(item[-1]))
                     RDL=None
                 elif item[0].val=='el':
                     if RDL and RDL.actInfo:
                         codes.append(ST(RDL))
+                    codes.append('JMP ')
+                    jmpToEnd.append((len(asmCode),len(codes)-1))
                     codes.append('next'+str(self.id)+':')
+                    x,y=judgeOfIf.pop()
+                    # print("="*20)
+                    # print(x,y)
+                    # print(asmCode)
+                    asmCode[x][y] += 'next' + str(self.id)
                     self.id+=1
                 elif item[0].val=='ie':
                     if RDL and RDL.actInfo:
                         codes.append(ST(RDL))
-                    codes.append('next' + str(self.id) + ':')
+                    codes.append('endif' + str(self.id) + ':')
+                    while jmpToEnd:
+                        x,y=jmpToEnd.pop()
+                        asmCode[x][y]+='endif' + str(self.id)
                     self.id += 1
                 elif item[0].val=='wh':
-                    codes.append('next' + str(self.id) + ':')
+                    codes.append('while' + str(self.id) + ':')
+                    startOfWhile.append('while' + str(self.id))
                     self.id += 1
                 elif item[0].val=='we':
-                    codes.append('next' + str(self.id) + ':')
+                    tgt=startOfWhile.pop()
+                    codes.append('JMP '+tgt)
+                    codes.append('endWhile' + str(self.id) + ':')
+                    x,y=judgeOfWhile.pop()
+                    asmCode[x][y]+='endWhile' + str(self.id)
                     self.id += 1
+                elif item[0].val=='return':
+                    if RDL!=item[1]:
+                        codes.append(LD(item[1]))
+                    codes.append("RET")
+                elif item[0].val=='FUN':
+                    codes.append(item[1].val+':')
+                elif item[0].val=='push':
+                    if RDL==None:
+                        codes.append(LD(item[1]))
+                    elif RDL!=item[0]:
+                        codes.append(ST(RDL))
+                        codes.append(LD(item[1]))
+                    codes.append("PUSH R")
+                elif item[0].val=='call':
+                    codes.append("CALL %s"%item[1].val)
+                elif item[0].val=='callr':
+                    codes.append("CALL %s"%item[1].val)
+                    codes.append(ST(item[-1]))
 
-            print(codes)
+            asmCode.append(codes)
+            # for c in codes:
+            #     print(c)
+            # print('\n')
 
-
-
-
-
-
+        for item in asmCode:
+            for i in item:
+                print(i)
 
 
 
@@ -178,8 +210,6 @@ if __name__=='__main__':
         #     print('_'*40)
         # print(qtListAfterOpt)
         asm=AsmCodeGen(ll1.syn_table,qtListAfterOpt)
-
-
     else:
         print(res)
     ll1.syn_table.showTheInfo()
