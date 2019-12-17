@@ -4,8 +4,9 @@ from grammarParaser import GrammarParser
 class QtGen(GrammarParser): #四元式生成
     t_id=0
     qt_res=[]
-    def __init__(self):
+    def __init__(self,syn):
         GrammarParser.__init__(self)
+        self.syn_table=syn
         translation_grammar_path=os.path.abspath('grammar_static/translation_grammar')
         self.P_LIST=[]
         with open(translation_grammar_path,'r',encoding='utf-8') as f:
@@ -25,6 +26,8 @@ class QtGen(GrammarParser): #四元式生成
         TokenList=copy.copy(funcBlock)
         self.t_id=0
         def getTokenVal(token):
+            if token.val in self.syn_table.structNameList:
+                return 'st'  # 转换成结构体的笼统形式方便定义的时候类型确认
             if token.type == 'con':
                 return 'NUM'
             if token.type == 'i':
@@ -37,7 +40,7 @@ class QtGen(GrammarParser): #四元式生成
             if deal=='@PUSH':
                 SEM_STACK.append(val)
             if deal=='@GEQ':
-                if symbol=="el" or symbol=="ie" or symbol=="wh" or symbol=="we":
+                if symbol in ["el","ie","wh","we","break","continue"]:
                     qtList.append([symbol,'_','_','_'])
                 else:
                     s=SYMBOL_STACK.pop()

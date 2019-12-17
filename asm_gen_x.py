@@ -37,11 +37,13 @@ class AsmCodeGen:
         def ST(x):
             return "ST R,%s"%(x.val)
 
-        asmCode=[]  #生成的目标代码
-        startOfWhile=[]    #记录while语句开始地址
+        asmCode=[]          #生成的目标代码
+        #记录↓
+        startOfWhile=[]     #记录while语句开始地址
         judgeOfWhile=[]     #记录while中判断句的位置待填写跳转信息
         judgeOfIf=[]        #记录if判断句的位置待填写跳转信息
         jmpToEnd=[]         #记录if跳转到结束的位置跳转信息待填
+
         for bloc in funcBlock:
             self.actInfoGen(bloc)
             RDL=None

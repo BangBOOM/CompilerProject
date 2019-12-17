@@ -1,83 +1,122 @@
 from collections import namedtuple
+import re
 
 
-class Function:
-    def __init__(self,name,returnType,funAddr):
-        self.functionName=name              #函数名
-        self.numOfParameters=0              #参数数量
-        self.typeOfParametersList=[]        #参数类型列表
-        self.returnType=returnType          #返回值类型
-        self.variableDict={}                #变量字典   key:name value:variableType
-        self.variableType=namedtuple('variable','name type addr')
-        self.addrOfFunction=funAddr         #函数相对程序入口函数的便宜地址
-        self.addrOfVariable=0               #变量相对函数入口的偏移地址
+class SecTable:
+    def __init__(self):
+        self.variableDict = {}  # 变量字典   key:name value:variableType
+        self.variableType = namedtuple('variable', 'name type addr')
+        self.totalSize = 0  # 整体变量占的空间方便汇编代码填写地址
 
-    def incVariableAddr(self):
-        self.addrOfVariable+=1
-        return self.addrOfVariable
+    def addPaVariable(self, token, typ):  # 添加参数
+        pass
 
-    def addVariable(self,token,typ,doseParameter=False):    #添加参数
+    def addVariable(self, token, typ, s):  # 添加变量
         self.checkHasDefine(token)
-        tmp=self.variableType(token.val,typ,self.incVariableAddr())
+        tmp = self.variableType(token.val, typ, self.totalSize)
+        self.totalSize += s
         self.variableDict[token.val] = tmp
-        if doseParameter:                   #若是参数则在参数列表里添加
-            self.typeOfParametersList.append(typ)
-            self.numOfParameters+=1
 
-    def checkHasDefine(self,token):    #检查重复定义问题
+    def checkHasDefine(self, token):  # 检查重复定义问题
         if token.val in list(self.variableDict.keys()):
             raise ValueError('error variable duplicate definition in line ',
-                             token.cur_line+1,token.val)
+                             token.cur_line + 1, token.val)
 
-    def checkDoDefine(self,token):      #检查是变量否定义
+    def checkDoDefine(self, token):  # 检查是变量使用时是否定义
         if token.val not in list(self.variableDict.keys()):
             raise ValueError('error variable has no definition in line ',
-                             token.cur_line+1,token.val)
+                             token.cur_line + 1, token.val)
+
+
+class Struct(SecTable):
+    def __init__(self, name):
+        super().__init__()
+        self.structName = name
+
+
+class Function(SecTable):
+    def __init__(self, name, returnType):
+        super().__init__()
+        self.functionName = name  # 函数名
+        self.numOfParameters = 0  # 参数数量
+        self.typeOfParametersList = []  # 参数类型列表
+        self.returnType = returnType  # 返回值类型
+
+    def addPaVariable(self, token, typ):  # 添加参数
+        tmp = self.variableType(token.val, typ, -2)
+        for key in list(self.variableDict.keys()):
+            t = self.variableDict[key]
+            self.variableDict[key] = self.variableType(t.name, t.type, t.addr - 2)
+        self.variableDict[token.val] = tmp
+        self.numOfParameters += 1
 
 
 class SYMBOL:
-    curAddr=0
-    functionList=[]         #Function 集合
-    functionNameList=[]     #Function name 集合方便查找重复定义情况
+    functionList = []  # Function 集合
+    structList = []  # 结构体列表
+    allList = []  # 保存结构体和函数
+    globalNameList = []  # Function Struct name 集合方便查找重复定义情况
+    structNameList = []  # 结构体名用于grammar中定义结构体变量的时候类型识别
+    symDict = {}  # {name:secTable}    #用于生成目标代码时查找
 
-    def incCurAddr(self):
-        self.curAddr+=1
-        return self.curAddr
-
-    def checkHasDefine(self,token):
-        if token.val in self.functionNameList:
+    def checkHasDefine(self, token):  # 定义的时候检查是否已经定义
+        if token.val in self.globalNameList:
             raise ValueError('error variable duplicate definition in line ',
                              token.cur_line + 1)
 
-
-    def addFunction(self,token,returnType):
+    def addFunction(self, token, returnType):  # 添加函数
         self.checkHasDefine(token)
-        function=Function(token.val,returnType,self.incCurAddr())
+        function = Function(token.val, returnType)
         self.functionList.append(function)
-        self.functionNameList.append(token.val)
+        self.allList.append(function)
+        self.globalNameList.append(token.val)
+        self.symDict[token.val] = function
 
-    def addVariableToFunction(self,token,varType,doseParameter=False):
-        function=self.functionList[-1]
-        function.addVariable(token,varType,doseParameter)
+    def addStruct(self, token):  # 添加结构体
+        self.checkHasDefine(token)
+        st = Struct(token.val)
+        self.structList.append(st)
+        self.allList.append(st)
+        self.globalNameList.append(token.val)
+        self.structNameList.append(token.val)
+        self.symDict[token.val] = st
 
-    def checkDoDefineInFunction(self,token):
+    def addVariableToTable(self, token, varType, doseParameter=False):  #添加新定义的变量
+        tmp = self.allList[-1]
+        if doseParameter:
+            tmp.addPaVariable(token, varType)
+        else:
+            s = 0
+            if varType == 'int':
+                s = 2
+            if varType in self.structNameList:
+                s = self.symDict[varType].totalSize
+            if '[' in token.val:
+                p1 = re.compile(r"[[](.*?)[]]", re.S)
+                res = re.findall(p1, token.val)
+                num = eval(res[0])
+                s *= num
+                varType = 'array'
+            tmp.addVariable(token, varType, s)
+
+    def checkDoDefineInFunction(self, token):  # 检测函数中调用变量的时候变量是否存在
         function = self.functionList[-1]
         function.checkDoDefine(token)
 
-    def checkDoDefineFunction(self,token):
-        if token.val not in self.functionNameList:
-            raise ValueError('error variable duplicate definition in line ',
-                             token.cur_line + 1,token.val)
+    def checkDoDefineFunction(self, token):  # 调用函数时候检查函数是否定义
+        if token.val not in self.globalNameList:
+            raise ValueError('error variable no definition in line ',
+                             token.cur_line + 1, token.val)
 
-    def showTheInfo(self):  #打印符号表的信息
+    def showTheInfo(self):  # 打印符号表的信息
         for fun in self.functionList:
-            print("function: %s. ReturnType %s. ADDR %d. NumOfParameters %d."
-                  %(fun.functionName,fun.returnType,fun.addrOfFunction,fun.numOfParameters))
-            for _,v in fun.variableDict.items():
-                print("    variable: name %s type: %s addr: %s"%v)
+            print("function: %s. ReturnType %s. NumOfParameters %d. size %d"
+                  % (fun.functionName, fun.returnType, fun.numOfParameters, fun.totalSize))
+            for _, v in fun.variableDict.items():
+                print("    variable: name %s type: %s addr: %s" % v)
 
-
-
-
-
-
+        for struct in self.structList:
+            print("struct: name %s size %d"
+                  % (struct.structName, struct.totalSize))
+            for _, v in struct.variableDict.items():
+                print("    variable: name %s type: %s addr: %s" % v)

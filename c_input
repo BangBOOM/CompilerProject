@@ -2,7 +2,7 @@ struct Demo{
     int id;
     int gpa;
 };
-int tmp(int a,int b){
+int tmp(int a,int b,int m){
     int c;
     c=a+b;
     return c;
@@ -11,10 +11,13 @@ int main(){
     int d;
     int c;
     Demo de;
+    int m[3];
+    m[1]=10;
     de.id=2;
     d=2;
     while(d<10){
         d=d+1;
+        break;
     }
     if(d>0){
         c=(d+2)/4;

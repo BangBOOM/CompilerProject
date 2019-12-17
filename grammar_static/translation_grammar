@@ -1,14 +1,16 @@
-Program->Funcs
+Program->Struct Funcs
 Funcs->FuncsHead { CodeBody } Funcs
 FuncsHead->Type ID @PUSH_VAL @SAVE_FUN @GEQ_G ( FormalParameters )
 Funcs->$
-FormalParameters->Type ID FormalParameters
-FormalParameters->, Type ID FormalParameters
+FormalParameters->Type ID FormalParametersFollow
 FormalParameters->$
+FormalParametersFollow->, Type ID FormalParametersFollow
+FormalParametersFollow->$
 Type->int
 Type->void
 Type->float
 Type->char
+Type->st
 CodeBody->$
 CodeBody->LocalDefineList CodeList
 LocalDefineList->LocalVarDefine LocalDefineList
@@ -50,6 +52,8 @@ CompareSymbol->< @SAVE_<
 CompareSymbol->> @SAVE_>
 Code->LoopStatement
 LoopStatement->while @GEQ_wh @SAVE_do ( JudgeStatement ) @GEQ_G { CodeBody } @GEQ_we
+Code->break @GEQ_break ;
+Code->continue @GEQ_continue ;
 Code->return @SAVE_return Operation @GEQ_G ;
 Code->FuncCall
 FuncCall->CALL ID @PUSH_VAL FuncCallFollow ;
@@ -58,3 +62,5 @@ FuncCallFollow->( Args ) @SAVE_call @GEQ_c2
 Args->F @SAVE_push @GEQ_G Args
 Args->, F @SAVE_push @GEQ_G Args
 Args->$
+Struct->struct st { LocalDefineList } ; Struct
+Struct->$

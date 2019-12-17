@@ -11,3 +11,5 @@ double
 return
 CALL
 struct
+break
+continue

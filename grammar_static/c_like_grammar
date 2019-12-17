@@ -2,13 +2,15 @@ Program->Struct Funcs
 Funcs->FuncsHead { CodeBody } Funcs
 FuncsHead->Type ID ( FormalParameters )
 Funcs->$
-FormalParameters->Type ID FormalParameters
-FormalParameters->, Type ID FormalParameters
+FormalParameters->Type ID FormalParametersFollow
 FormalParameters->$
+FormalParametersFollow->, Type ID FormalParametersFollow
+FormalParametersFollow->$
 Type->int
 Type->void
 Type->float
 Type->char
+Type->st
 CodeBody->$
 CodeBody->LocalDefineList CodeList
 LocalDefineList->LocalVarDefine LocalDefineList
@@ -50,6 +52,8 @@ CompareSymbol-><
 CompareSymbol->>
 Code->LoopStatement
 LoopStatement->while ( JudgeStatement ) { CodeBody }
+Code->break ;
+Code->continue ;
 Code->return Operation ;
 Code->FuncCall
 FuncCall->CALL ID FuncCallFollow ;
@@ -58,5 +62,5 @@ FuncCallFollow->( Args )
 Args->F Args
 Args->, F Args
 Args->$
-Struct->struct ID { LocalDefineList } ; Struct
+Struct->struct st { LocalDefineList } ; Struct
 Struct->$

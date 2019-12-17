@@ -72,7 +72,7 @@ class Lexer:
             return "END"
         elif item.isalpha() or item == '_':
             demo = ""
-            while item.isalpha() or item.isdigit() or item == "_" or item == '.':
+            while item.isalpha() or item.isdigit() or item in ['_','.','[',']']:
                 demo += item
                 if self.CUR_ROW == len(self.INPUT[self.CUR_LINE]) - 1:
                     self.CUR_LINE += 1
