@@ -10,3 +10,4 @@ float
 double
 return
 CALL
+struct

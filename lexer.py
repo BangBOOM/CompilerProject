@@ -72,7 +72,7 @@ class Lexer:
             return "END"
         elif item.isalpha() or item == '_':
             demo = ""
-            while item.isalpha() or item.isdigit() or item == "_":
+            while item.isalpha() or item.isdigit() or item == "_" or item == '.':
                 demo += item
                 if self.CUR_ROW == len(self.INPUT[self.CUR_LINE]) - 1:
                     self.CUR_LINE += 1
@@ -142,7 +142,10 @@ class Lexer:
 
 if __name__ == "__main__":
     lex = Lexer()
-    INPUT = ['int a=0;\n', 'a=a+4;\n', 'c="ss"\n']
+    path = os.path.abspath('c_input')
+    with open(path, 'r', encoding='utf-8') as f:
+        INPUT = f.readlines()
+    # INPUT = ['int a=0;\n', 'a=a+4;\n', 'c="ss"\n']
     lex.getInput(INPUT)
     res = lex.analyse()
     for tmp in res:

@@ -1,3 +1,7 @@
+struct Demo{
+    int id;
+    int gpa;
+};
 int tmp(int a,int b){
     int c;
     c=a+b;
@@ -6,6 +10,8 @@ int tmp(int a,int b){
 int main(){
     int d;
     int c;
+    Demo de;
+    de.id=2;
     d=2;
     while(d<10){
         d=d+1;

@@ -140,7 +140,7 @@ class AsmCodeGen:
 
     def actInfoGen(self,bloc):
         '''
-        传入代码块添加活跃信息
+        传入代码块添加活跃信息，同时基于符号表填写临时变量的偏移地址
         :param bloc:
         :return:
         '''

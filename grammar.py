@@ -38,35 +38,34 @@ class LL1(GrammarParser):
             x=stack.pop()
             if x!=w:
                 if x not in self.VN:
-                    print(x)
+                    print("missing '%s' around line %d"%(x,token.cur_line))
                     return "error1" #这个位置中止整个程序返回报错信息
                 id=self.analysis_table[x][w]
                 if id==-1:
-                    print(x,w)
-                    print('stack:',stack)
+                    print("wrong grammar around line %s"%(token.cur_line))
                     return "error2" #这个位置中止整个程序返回报错信息
                 tmp=self.P_LIST[id][1]
                 if tmp!=['$']:  #进行标识符登记检测
                     tmp=list(tmp)
                     stack+=tmp[::-1]
-                    if x=="Funcs":  #函数定义
-                        self.__AddFuncToSYN(token)
-                    if x=="FormalParameters":  #函数参数添加
-                        if token.val!=',':
-                            self.__AddVariableToFun(token,True)
-                        else:
-                            self.__AddVariableToFun(self.RES_TOKEN[token.id+1],True)
-                    if x=="LocalVarDefine": #函数内部变量定义
-                        self.__AddVariableToFun(token)
-                    if x=="NormalStatement" or (x=="F" and w=="ID" ):
-                        self.__CheckVarToken(token)
-                    if x=="FuncCallFollow":
-                        id=token.id
-                        if w=="=":
-                            id+=1
-                        else:
-                            id-=1
-                        self.__CheckFunToken(self.RES_TOKEN[id])
+                    # if x=="Funcs":  #函数定义
+                    #     self.__AddFuncToSYN(token)
+                    # if x=="FormalParameters":  #函数参数添加
+                    #     if token.val!=',':
+                    #         self.__AddVariableToFun(token,True)
+                    #     else:
+                    #         self.__AddVariableToFun(self.RES_TOKEN[token.id+1],True)
+                    # if x=="LocalVarDefine": #函数内部变量定义
+                    #     self.__AddVariableToFun(token)
+                    # if x=="NormalStatement" or (x=="F" and w=="ID" ):
+                    #     self.__CheckVarToken(token)
+                    # if x=="FuncCallFollow":
+                    #     id=token.id
+                    #     if w=="=":
+                    #         id+=1
+                    #     else:
+                    #         id-=1
+                    #     self.__CheckFunToken(self.RES_TOKEN[id])
 
             else:
                 if w=='#':
@@ -94,3 +93,13 @@ class LL1(GrammarParser):
 
     def __CheckFunToken(self,token):    #检测函数是否定义
         self.syn_table.checkDoDefineFunction(token)
+
+if __name__ == '__main__':
+    grammar_path = os.path.abspath('grammar_static/c_like_grammar')
+    path=os.path.abspath('c_input')
+    with open(path,'r',encoding='utf-8') as f:
+        INPUT=f.readlines()
+    ll1=LL1(grammar_path,True)
+    ll1.getInput(INPUT)
+    res=ll1.analyzeInputString()
+    print(res)

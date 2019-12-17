@@ -1,4 +1,4 @@
-Program->Funcs
+Program->Struct Funcs
 Funcs->FuncsHead { CodeBody } Funcs
 FuncsHead->Type ID ( FormalParameters )
 Funcs->$
@@ -58,3 +58,5 @@ FuncCallFollow->( Args )
 Args->F Args
 Args->, F Args
 Args->$
+Struct->struct ID { LocalDefineList } ; Struct
+Struct->$
