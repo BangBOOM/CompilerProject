@@ -48,15 +48,15 @@ class Optimization:
         self.nodes = []
         self.new_qt = []
         self.NODE = namedtuple('NODE', 'op ID signs leftNodeID rightNodeID')
+        self.operation=['+', '-', '*', '/', '=','>','<','==','>=','<=']
         for qt in bloc:  # 假设四元式为（op,B,C,A)
             "构造DOG"
-            if qt[0] in ['+', '-', '*', '/', '=']:
-                if qt[0] == '=':  # qt是赋值四元式A=B；
+
+            if qt[0] in self.operation:
+                if qt[0] in ['=']:  # qt一元运算符
                     idB = self.Get_NODE(qt[1])
                     self.delete_sym(qt[3])
                     self.add_to_node(idB, qt[3])
-
-
                 else:
                     if qt[1].isdigit() and qt[2].split('.')[-1].isdigit():
                         idP = self.Get_NODE(str(float(qt[1]) * float(qt[2])))
@@ -71,12 +71,24 @@ class Optimization:
 
         # print("所有结点", self.nodes)
         self.generate_new_qt(self.nodes)
-        if bloc[-1][0] not in ['+', '-', '*', '/']:  # 最后一个才可能不是运算四元式
-            self.new_qt.append(bloc[-1])  # 这部分不需要优化
+        flag = 0
+        i = 0
+        for qt in bloc:
+
+            if qt[0] not in self.operation:  # 最后一个才可能不是运算四元式
+
+                if flag==1:
+                    self.new_qt.append(qt)  # 这部分不需要优化
+                else:
+                    self.new_qt.insert(i,qt)
+                    i=i+1
+            else:
+                flag=1
+
 
     def Get_NODE(self, sym, BofLeftNodeID=None, CofRightNodeID=None):
         "如果存在一个结点含有sym则返回结点id；如果不存在，创一个新结点，对其编号并且返回它的id(sym 可能是操作数或操作符)"
-        if sym in ['+', '-', '*', '/', '=']:
+        if sym in self.operation:
             for node in reversed(self.nodes):  # 倒序遍历数组
                 if sym == node.op and (sym == '+' or sym == '*'):
                     if (BofLeftNodeID == node.leftNodeID and CofRightNodeID == node.rightNodeID) or (
