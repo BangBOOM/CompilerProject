@@ -83,9 +83,8 @@ class QtGen(GrammarParser): #四元式生成
                 except:
                     w='#'
         self.qt_res.append(qtList)
-        # return qtList
-        print("四元式：")
-        for item in qtList:
-            print(item)
-        print('-'*25)
+        # print("四元式：")
+        # for item in qtList:
+        #     print(item)
+        # print('-'*25)
 

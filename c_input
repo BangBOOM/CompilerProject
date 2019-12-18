@@ -5,6 +5,7 @@ struct Demo{
 int tmp(int a,int b,int m){
     int c;
     c=a+b;
+    c=(a+b)/(a+b);
     return c;
 }
 int main(){

@@ -1,7 +1,6 @@
 from grammar import LL1
 from qt_gen import QtGen
 from optimization import Optimization
-from asm_gen_x import AsmCodeGen
 import os
 
 
@@ -14,22 +13,17 @@ if __name__ == '__main__':
     ll1.getInput(INPUT)
     res=ll1.analyzeInputString()
     qt = QtGen(ll1.syn_table)
-
-    # asm=AsmCodeGen(ll1.syn_table)
+    op=Optimization(ll1.syn_table)
     if res=='acc':
-        for block in ll1.funcBlocks:
-            qt_list=qt.genQt(block)
-    #         # print("四元式：")
-    #         # for item in qt_list:
-    #         #     print(item)
-    #         # print('-'*25)
-    #     op = Optimization(qt.qt_res, ll1.syn_table)
-    #     for b in op.qtLists:
-    #         tmp=op.opt(b)   #划分基本块
-    #         for t in tmp:
-    #             asm.actInfoGen(t)
-    #         # asm.getAsm(tmp)
-    # else:
-    #     print(res)
-    ll1.syn_table.showTheInfo()
+        for block in ll1.funcBlocks:    #block是一个函数块
+            qt.genQt(block)
+
+        for block in qt.qt_res:        #block是一个函数块
+            block=op.opt(block)
+            # for i in block:            #i是一条四元式
+            #     for x in i:
+            #         print(x)
+            #     print('\n')
+            # print("\n\n")
+        ll1.syn_table.showTheInfo()
 
