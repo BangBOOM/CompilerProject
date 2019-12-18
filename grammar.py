@@ -3,7 +3,6 @@ import symbol_table
 from lexer import Lexer
 from grammarParaser import GrammarParser
 
-
 class LL1(GrammarParser):
     RES_TOKEN = []
     syn_table = symbol_table.SYMBOL()
@@ -13,9 +12,9 @@ class LL1(GrammarParser):
         self.lex = Lexer()
         path = os.path.abspath('grammar_static/AnalysisTable.json')
         if doseIniList:
-            self.initList()
+            self.initList() #修改文法后重新初始化分析表
         else:
-            with open(path, 'r') as f:
+            with open(path, 'r') as f:  #从保存的json文件中读取分析表
                 self.analysis_table = json.load(fp=f)
 
     def getInput(self, INPUT):  # ['12-a+b']
@@ -50,26 +49,7 @@ class LL1(GrammarParser):
                 if tmp != ['$']:  # 进行标识符登记检测
                     tmp = list(tmp)
                     stack += tmp[::-1]
-                    if x == "Funcs":  # 函数定义
-                        self.__AddFuncToSYN(token)
-                    if x == "Struct":
-                        self.__AddStructToSYN(token)
-                    if x.startswith("FormalParameters"):  # 函数参数添加
-                        if token.val != ',':
-                            self.__AddVariable(token, True)
-                        else:
-                            self.__AddVariable(self.RES_TOKEN[token.id + 1], True)
-                    if x == "LocalVarDefine":  # 变量定义
-                        self.__AddVariable(token)
-                    if x == "NormalStatement" or (x == "F" and w == "ID"):
-                        self.__CheckVarToken(token)
-                    if x == "FuncCallFollow":
-                        id = token.id
-                        if w == "=":
-                            id += 1
-                        else:
-                            id -= 1
-                        self.__CheckFunToken(self.RES_TOKEN[id])
+                    self.editSymTable(x,w,token)
             else:
                 if w == '#':
                     self.funcBlocks.append(funcBlock)
@@ -84,6 +64,29 @@ class LL1(GrammarParser):
                 except:  # TokenList变为空
                     w = '#'
         return "error3"
+
+    def editSymTable(self,x,w,token):
+        '''添加符号表，检测定义问题'''
+        if x == "Funcs":  # 函数定义
+            self.__AddFuncToSYN(token)
+        if x == "Struct":
+            self.__AddStructToSYN(token)
+        if x.startswith("FormalParameters"):  # 函数参数添加
+            if token.val != ',':
+                self.__AddVariable(token, True)
+            else:
+                self.__AddVariable(self.RES_TOKEN[token.id + 1], True)
+        if x == "LocalVarDefine":  # 变量定义
+            self.__AddVariable(token)
+        if x == "NormalStatement" or (x == "F" and w == "ID"):
+            self.__CheckVarToken(token)
+        if x == "FuncCallFollow":
+            id = token.id
+            if w == "=":
+                id += 1
+            else:
+                id -= 1
+            self.__CheckFunToken(self.RES_TOKEN[id])
 
     def __AddFuncToSYN(self, token):  # 添加函数到符号表的总表
         self.syn_table.addFunction(self.RES_TOKEN[token.id + 1], token.val)

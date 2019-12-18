@@ -17,7 +17,7 @@ class Optimization:
             if tmp[0] in ['wh']:
                 res.append(bloc)
                 bloc=[tmp]
-            elif tmp[0] in ['do','we','if','el','elif','ie','return']:
+            elif tmp[0] in ['do','we','if','el','elif','ie','return','continue','break']:
                 bloc.append(tmp)
                 res.append(bloc)
                 bloc=[]
@@ -25,6 +25,7 @@ class Optimization:
                 res.append([tmp])
             else:
                 bloc.append(tmp)
+        funcBlock_new=[]
         for b in res:
             print("----old----")
             for i in b:
@@ -36,7 +37,8 @@ class Optimization:
                 print(i)
             print("----new----")
             print("\n\n")
-        return  res
+            funcBlock_new.append(self.new_qt)
+        return  funcBlock_new
 
 
     def optTheBloc(self,bloc):
@@ -59,7 +61,7 @@ class Optimization:
                     self.add_to_node(idB, qt[3])
                 else:
                     if qt[1].isdigit() and qt[2].split('.')[-1].isdigit():
-                        idP = self.Get_NODE(str(float(qt[1]) * float(qt[2])))
+                        idP=self.Get_NODE(str(int(eval(qt[1]+qt[0]+qt[2]))))
                         self.delete_sym(qt[3])
                         self.add_to_node(idP, qt[3])
                     else:

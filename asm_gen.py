@@ -46,6 +46,7 @@ class AsmCodeGen:
 
         for bloc in funcBlock:
             self.actInfoGen(bloc)
+
             RDL=None
             codes=[]
             for i,item in enumerate(bloc):
@@ -79,6 +80,11 @@ class AsmCodeGen:
                             codes.append(LD(item[1]))
                     codes.append(ST(item[-1]))
                     RDL=None
+
+                elif item[0].val=='continue':
+                    if RDL and RDL.actInfo:
+                        codes.append(ST(RDL))
+                    codes.append('JMP '+startOfWhile[-1])
                 elif item[0].val=='el':
                     if RDL and RDL.actInfo:
                         codes.append(ST(RDL))
@@ -155,6 +161,7 @@ class AsmCodeGen:
                     actTable[item]=False
                 elif item not in self.symTable.functionNameList:    #标识符且不是函数名称
                     actTable[item]=True
+        # print(actTable)
         for tmp in bloc[::-1]:  #倒序标注活跃信息  qtx=namedtuple('qtx','val actInfo') 使用这个具名元组 不具备活跃信息的actInfo=None
             demo=None
             if tmp[-1]=='_':
@@ -181,7 +188,7 @@ class AsmCodeGen:
         #     for y in x:
         #         print(y)
         #     print('-'*20)
-        # print('*'*20)
+        # print('\n\n')
 
 
 
@@ -194,10 +201,10 @@ if __name__=='__main__':
     path = os.path.abspath('c_input')
     with open(path, 'r', encoding='utf-8') as f:
         INPUT = f.readlines()
-    ll1 = LL1(grammar_path, True)
+    ll1 = LL1(grammar_path)
     ll1.getInput(INPUT)
     res = ll1.analyzeInputString()
-    qt = QtGen()
+    qt = QtGen(ll1.syn_table)
     if res == 'acc':
         for block in ll1.funcBlocks:
             qt.genQt(block)
@@ -206,15 +213,52 @@ if __name__=='__main__':
         qtListAfterOpt=[]   #基于函数块再其内部划分更小的块
         for item in qtLists:
             qtListAfterOpt.append(op.opt(item))
-        # for item in qtListAfterOpt:
-        #     for i in item:
-        #         print(i)
-        #     print('_'*40)
-        # print(qtListAfterOpt)
+        for item in qtListAfterOpt:
+            for i in item:
+                for b in i: #i是基本块
+                    print(b)
+                print('\n')
+            print('-'*30)
+
         asm=AsmCodeGen(ll1.syn_table,qtListAfterOpt)
+        ll1.syn_table.showTheInfo()
     else:
         print(res)
-    ll1.syn_table.showTheInfo()
+
+
+
+'''
+函数中:
+I:
+ID.X=10这种情况其中ID是函数的参数且是定义的结构体，这种情况往函数中传的是地址
+MOV BX , SS:[BP-XX] #XX是ID的参数相对函数的偏移地址在栈中
+MOV AX , 10
+MOV DS:[BX+XX] , AX #XX是结构体中变量的偏移地址在内存中
+若ID是函数中定义的结构体变量
+MOV AX , 10
+MOV SS:[BP+IDX+XX] , AX
+
+II:
+VAR=ID.X 这种情况VAR是函数中的变量 ID是参数结构体
+MOV BX , SS:[BP-XX]
+MOV AX , DS:[BX+XX]
+MOV SS:[BP+XX] , AX
+若ID是函数中的变量
+MOV AX , SS:[BP+IDX+XX]
+MOV SS:[BP+XX] , AX
+
+III:
+FUN(ID) 这种情况调用函数ID是结构体
+MOV AX , OFFSET ID
+PUSH AX
+
+'''
+
+
+
+
+
+
 
 
 

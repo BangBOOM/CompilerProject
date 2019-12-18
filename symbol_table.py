@@ -57,6 +57,7 @@ class SYMBOL:
     allList = []  # 保存结构体和函数
     globalNameList = []  # Function Struct name 集合方便查找重复定义情况
     structNameList = []  # 结构体名用于grammar中定义结构体变量的时候类型识别
+    functionNameList=[]
     symDict = {}  # {name:secTable}    #用于生成目标代码时查找
 
     def checkHasDefine(self, token):  # 定义的时候检查是否已经定义
@@ -70,6 +71,7 @@ class SYMBOL:
         self.functionList.append(function)
         self.allList.append(function)
         self.globalNameList.append(token.val)
+        self.functionNameList.append(token.val)
         self.symDict[token.val] = function
 
     def addStruct(self, token):  # 添加结构体
