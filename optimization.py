@@ -27,16 +27,16 @@ class Optimization:
                 bloc.append(tmp)
         funcBlock_new=[]
         for b in res:
-            print("----old----")
-            for i in b:
-                print(i)
-            print("----old----")
+            # print("----old----")
+            # for i in b:
+            #     print(i)
+            # print("----old----")
             self.optTheBloc(b)
-            print("----new----")
-            for i in self.new_qt:
-                print(i)
-            print("----new----")
-            print("\n\n")
+            # print("----new----")
+            # for i in self.new_qt:
+            #     print(i)
+            # print("----new----")
+            # print("\n\n")
             funcBlock_new.append(self.new_qt)
         return  funcBlock_new
 

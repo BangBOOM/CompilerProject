@@ -44,7 +44,7 @@ class AsmCodeGen:
         judgeOfIf=[]        #记录if判断句的位置待填写跳转信息
         jmpToEnd=[]         #记录if跳转到结束的位置跳转信息待填
 
-        for bloc in funcBlock:
+        for bloc in funcBlock:  #bloc基本块
             self.actInfoGen(bloc)
 
             RDL=None

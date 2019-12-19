@@ -1,5 +1,4 @@
 from collections import namedtuple
-import re
 
 
 class SecTable:
@@ -39,6 +38,7 @@ class Function(SecTable):
         super().__init__()
         self.functionName = name  # 函数名
         self.numOfParameters = 0  # 参数数量
+        self.parametersDict={}      #参数字典
         self.typeOfParametersList = []  # 参数类型列表
         self.returnType = returnType  # 返回值类型
 
@@ -48,6 +48,7 @@ class Function(SecTable):
             t = self.variableDict[key]
             self.variableDict[key] = self.variableType(t.name, t.type, t.addr - 2)
         self.variableDict[token.val] = tmp
+        self.parametersDict[token.val]=tmp
         self.numOfParameters += 1
 
 
@@ -94,9 +95,9 @@ class SYMBOL:
             if varType in self.structNameList:
                 s = self.symDict[varType].totalSize
             if '[' in token.val:
-                p1 = re.compile(r"[[](.*?)[]]", re.S)
-                res = re.findall(p1, token.val)
-                num = eval(res[0])
+                _,n=token.val.split('[')
+                n,_=n.split(']')
+                num = eval(n)
                 s *= num
                 varType = 'array'
             tmp.addVariable(token, varType, s)

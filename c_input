@@ -1,12 +1,25 @@
 struct Demo{
-    int id;
+    int id[10];
     int gpa;
 };
-int tmp(int a,int b,Demo m){
+int tmp(int a,int b,int f,Demo m){
     int c;
     c=a+b;
     c=(a+b)/(a+b)*(3-1);
-    m.gpa=10;
+    m.gpa=10+a;
+    if(b>0)
+    {
+    b=b+1;
+    }
+    elif(b==0){
+    b=0;
+    }
+    else{
+    b=b-1;
+    }
+    while(b>0){
+    b=2*b;
+    }
     return c;
 }
 int main(){
@@ -35,6 +48,6 @@ int main(){
     else {
     c=d+1;
     }
-    CALL c=tmp(c,d,de);
+    CALL c=tmp(c,d,d,de);
     return 0;
 }
