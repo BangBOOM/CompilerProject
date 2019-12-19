@@ -59,8 +59,9 @@ Code->FuncCall
 FuncCall->CALL ID FuncCallFollow ;
 FuncCallFollow->= ID ( Args )
 FuncCallFollow->( Args )
-Args->F Args
-Args->, F Args
+Args->F ArgsFollow
+ArgsFollow->, F ArgsFollow
 Args->$
+ArgsFollow->$
 Struct->struct st { LocalDefineList } ; Struct
 Struct->$

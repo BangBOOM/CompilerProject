@@ -59,8 +59,9 @@ Code->FuncCall
 FuncCall->CALL ID @PUSH_VAL FuncCallFollow ;
 FuncCallFollow->= ID @PUSH_VAL ( Args ) @SAVE_callr @GEQ_c1
 FuncCallFollow->( Args ) @SAVE_call @GEQ_c2
-Args->F @SAVE_push @GEQ_G Args
-Args->, F @SAVE_push @GEQ_G Args
+Args->F @SAVE_push @GEQ_G ArgsFollow
+ArgsFollow->, F @SAVE_push @GEQ_G ArgsFollow
 Args->$
+ArgsFollow->$
 Struct->struct st { LocalDefineList } ; Struct
 Struct->$
