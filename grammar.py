@@ -124,13 +124,7 @@ class LL1(GrammarParser):
         if x == "NormalStatement" or (x == "F" and w == "ID"):
             return checkVarToken(token)
             # return Message(None, None, None)
-
         if x == "FuncCallFollow":
-            id = token.id
-            if w == "=":
-                id += 1
-            else:
-                id -= 1
             return checkFun(token)
         message = Message(None, None, None)
         return message
