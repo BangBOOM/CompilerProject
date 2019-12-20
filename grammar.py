@@ -141,7 +141,7 @@ if __name__ == '__main__':
     path = os.path.abspath('c_input')
     with open(path, 'r', encoding='utf-8') as f:
         INPUT = f.readlines()
-    ll1 = LL1(grammar_path, True)
+    ll1 = LL1(grammar_path)
     ll1.getInput(INPUT)
     res = ll1.analyzeInputString()
     print(res)
