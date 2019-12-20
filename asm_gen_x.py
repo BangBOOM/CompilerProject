@@ -548,7 +548,7 @@ if __name__ == '__main__':
     res = ll1.analyzeInputString()
     qt = QtGen(ll1.syn_table)
     ll1.syn_table.showTheInfo()
-    if res == 'acc':
+    if res.ErrorType == 'acc':
         for block in ll1.funcBlocks:
             qt.genQt(block)
         op = Optimization(ll1.syn_table)
