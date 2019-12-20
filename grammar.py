@@ -72,6 +72,7 @@ class LL1(GrammarParser):
             else:
                 if w == '#':
                     self.funcBlocks.append(funcBlock)
+                    self.syn_table.showTheInfo()
                     return ('acc', None, None)
                     # return "acc"
                 try:

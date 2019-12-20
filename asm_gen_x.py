@@ -25,8 +25,8 @@ class AsmCodeGen:
         for funcBlock in self.allCode:
             self.getAsm(funcBlock)
         self.getAll()
-        for item in self.allAsmCode:
-            print(item)
+        # for item in self.allAsmCode:
+        #     print(item)
 
 
     def getAll(self):
