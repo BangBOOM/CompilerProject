@@ -45,7 +45,7 @@ class AsmCodeGen:
         for k,v in mainSYM.variableDict.items():
             if v.type=='int':
                 self.allAsmCode.append("%s dw ?"%k)
-            if v.type == 'array':
+            elif v.type == 'array':
                 n, m = k.split('[')
                 m, _ = m.split(']')
                 self.allAsmCode.append("%s dw %s DUP (0)" % (n, m))
@@ -53,9 +53,9 @@ class AsmCodeGen:
                 self.allAsmCode.append("%s %s <?>"%(k,v.type))
         self.allAsmCode.append("DSEG ENDS")
         self.allAsmCode+=[
-            "SSEG SEGMENT STACK"
-            "STK DB	40 DUP (0)"
-            "SSEG ENDS"
+            "SSEG SEGMENT STACK",
+            "STK DB	40 DUP (0)",
+            "SSEG ENDS",
         ]
         self.allAsmCode+=[
             "CSEG SEGMENT",
@@ -407,6 +407,8 @@ class AsmCodeGen:
                             if RDL.actInfo:
                                 codes += ST(RDL)
                             codes += LD(item[1])
+                    else:
+                        codes+=LD(item[1])
                     codes.append("MOV SP,BP")
                     codes.append("POP BP")
                     numOfPar = self.symTable.symDict[funcName].numOfParameters

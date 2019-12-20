@@ -38,7 +38,7 @@ class Function(SecTable):
         super().__init__()
         self.functionName = name  # 函数名
         self.numOfParameters = 0  # 参数数量
-        self.parametersDict={}      #参数字典
+        self.parametersDict = {}  # 参数字典
         self.typeOfParametersList = []  # 参数类型列表
         self.returnType = returnType  # 返回值类型
 
@@ -48,7 +48,7 @@ class Function(SecTable):
             t = self.variableDict[key]
             self.variableDict[key] = self.variableType(t.name, t.type, t.addr - 2)
         self.variableDict[token.val] = tmp
-        self.parametersDict[token.val]=tmp
+        self.parametersDict[token.val] = tmp
         self.numOfParameters += 1
 
 
@@ -58,7 +58,7 @@ class SYMBOL:
     allList = []  # 保存结构体和函数
     globalNameList = []  # Function Struct name 集合方便查找重复定义情况
     structNameList = []  # 结构体名用于grammar中定义结构体变量的时候类型识别
-    functionNameList=[]
+    functionNameList = []
     symDict = {}  # {name:secTable}    #用于生成目标代码时查找
 
     def checkHasDefine(self, token):  # 定义的时候检查是否已经定义
@@ -84,7 +84,7 @@ class SYMBOL:
         self.structNameList.append(token.val)
         self.symDict[token.val] = st
 
-    def addVariableToTable(self, token, varType, doseParameter=False):  #添加新定义的变量
+    def addVariableToTable(self, token, varType, doseParameter=False):  # 添加新定义的变量
         tmp = self.allList[-1]
         if doseParameter:
             tmp.addPaVariable(token, varType)
@@ -95,8 +95,8 @@ class SYMBOL:
             if varType in self.structNameList:
                 s = self.symDict[varType].totalSize
             if '[' in token.val:
-                _,n=token.val.split('[')
-                n,_=n.split(']')
+                _, n = token.val.split('[')
+                n, _ = n.split(']')
                 num = eval(n)
                 s *= num
                 varType = 'array'
@@ -112,14 +112,28 @@ class SYMBOL:
                              token.cur_line + 1, token.val)
 
     def showTheInfo(self):  # 打印符号表的信息
+        symbolTableInfoStr=[]
         for fun in self.functionList:
-            print("function: %s. ReturnType %s. NumOfParameters %d. size %d"
-                  % (fun.functionName, fun.returnType, fun.numOfParameters, fun.totalSize))
+            demo="FuncName:{:<8s} ReturnType:{:<8s} NumOfParameters:{:<3d} Size:{:<3d}".format(
+                fun.functionName, fun.returnType, fun.numOfParameters, fun.totalSize
+            )
+            symbolTableInfoStr.append(demo)
             for _, v in fun.variableDict.items():
-                print("    variable: name %s type: %s addr: %s" % v)
-
+                demo="    VariableName:{:<8s} Type:{:<8s} Addr:{:<3d}".format(
+                    v.name,v.type,v.addr
+                )
+                symbolTableInfoStr.append(demo)
         for struct in self.structList:
-            print("struct: name %s size %d"
-                  % (struct.structName, struct.totalSize))
+            demo="StructName:{:<8s} Size:{:<3d}".format(
+                struct.structName,struct.totalSize
+            )
+            symbolTableInfoStr.append(demo)
             for _, v in struct.variableDict.items():
-                print("    variable: name %s type: %s addr: %s" % v)
+                demo="    VariableName:{:<8s} Type:{:<8s} Addr:{:<3d}".format(
+                    v.name, v.type, v.addr
+                )
+                symbolTableInfoStr.append(demo)
+        # for item in symbolTableInfoStr:
+        #     print(item)
+        self.symbolTableInfo=symbolTableInfoStr
+
