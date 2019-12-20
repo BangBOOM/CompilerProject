@@ -12,6 +12,8 @@ if __name__ == '__main__':
     ll1=LL1(grammar_path)
     ll1.getInput(INPUT)
     res=ll1.analyzeInputString()
+    print("message=",res)
+    '''
     if res == 'acc':
         qt = QtGen(ll1.syn_table)
         op=Optimization(ll1.syn_table)
@@ -30,4 +32,4 @@ if __name__ == '__main__':
         #     for b in item:
         #         print(b)
         # ll1.syn_table.showTheInfo()
-
+    '''
