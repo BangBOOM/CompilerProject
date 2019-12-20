@@ -4,7 +4,7 @@ struct Demo{
 };
 int tmp(int a,int b,int f,Demo m){
     int c;
-    c=a+b;
+    c=a+f;
     c=(a+b)/(a+b)*(3-1);
     m.gpa=10+a;
     if(b>0)

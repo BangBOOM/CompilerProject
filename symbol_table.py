@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+Message=namedtuple('Message', 'ErrorType Location ErrorMessage')
 
 class SecTable:
     def __init__(self):
@@ -11,20 +12,27 @@ class SecTable:
         pass
 
     def addVariable(self, token, typ, s):  # 添加变量
-        self.checkHasDefine(token)
+        message=self.checkHasDefine(token)
         tmp = self.variableType(token.val, typ, self.totalSize)
         self.totalSize += s
         self.variableDict[token.val] = tmp
+        return message
 
     def checkHasDefine(self, token):  # 检查重复定义问题
         if token.val in list(self.variableDict.keys()):
-            raise ValueError('error variable duplicate definition in line ',
-                             token.cur_line + 1, token.val)
+            ErrorType = 'Duplicate identified'
+            Location = 'Location:line {line}'.format(line=token.cur_line + 1)
+            ErrorMessage = "variable '{token}' duplicate definition".format(token=token.val)
+            return Message(ErrorType,Location,ErrorMessage)
+        return Message(None,None,None)
 
     def checkDoDefine(self, token):  # 检查是变量使用时是否定义
         if token.val not in list(self.variableDict.keys()):
-            raise ValueError('error variable has no definition in line ',
-                             token.cur_line + 1, token.val)
+            ErrorType = 'Unknown identifier'
+            Location = 'Location:line {line}'.format(line=token.cur_line)
+            ErrorMessage = "variable '{token}' has no definition".format(token=token.val)
+            return Message(ErrorType, Location, ErrorMessage)
+        return Message(None, None, None)
 
 
 class Struct(SecTable):
@@ -43,6 +51,7 @@ class Function(SecTable):
         self.returnType = returnType  # 返回值类型
 
     def addPaVariable(self, token, typ):  # 添加参数
+        message=self.checkHasDefine(token)
         tmp = self.variableType(token.val, typ, -2)
         for key in list(self.variableDict.keys()):
             t = self.variableDict[key]
@@ -50,6 +59,7 @@ class Function(SecTable):
         self.variableDict[token.val] = tmp
         self.parametersDict[token.val] = tmp
         self.numOfParameters += 1
+        return message
 
 
 class SYMBOL:
@@ -63,31 +73,36 @@ class SYMBOL:
 
     def checkHasDefine(self, token):  # 定义的时候检查是否已经定义
         if token.val in self.globalNameList:
-            raise ValueError('error variable duplicate definition in line ',
-                             token.cur_line + 1)
+            ErrorType = 'Duplicate identified'
+            Location = 'Location:line {line}'.format(line=token.cur_line + 1)
+            ErrorMessage = "variable '{token}' duplicate definition".format(token=token.val)
+            return Message(ErrorType,Location,ErrorMessage)
+        return Message(None,None,None)
 
     def addFunction(self, token, returnType):  # 添加函数
-        self.checkHasDefine(token)
+        message=self.checkHasDefine(token)
         function = Function(token.val, returnType)
         self.functionList.append(function)
         self.allList.append(function)
         self.globalNameList.append(token.val)
         self.functionNameList.append(token.val)
         self.symDict[token.val] = function
+        return message
 
     def addStruct(self, token):  # 添加结构体
-        self.checkHasDefine(token)
+        message=self.checkHasDefine(token)
         st = Struct(token.val)
         self.structList.append(st)
         self.allList.append(st)
         self.globalNameList.append(token.val)
         self.structNameList.append(token.val)
         self.symDict[token.val] = st
+        return message
 
     def addVariableToTable(self, token, varType, doseParameter=False):  # 添加新定义的变量
         tmp = self.allList[-1]
         if doseParameter:
-            tmp.addPaVariable(token, varType)
+            message=tmp.addPaVariable(token, varType)
         else:
             s = 0
             if varType == 'int':
@@ -100,16 +115,39 @@ class SYMBOL:
                 num = eval(n)
                 s *= num
                 varType = 'array'
-            tmp.addVariable(token, varType, s)
+            message=tmp.addVariable(token, varType, s)
+        return message
 
     def checkDoDefineInFunction(self, token):  # 检测函数中调用变量的时候变量是否存在
         function = self.functionList[-1]
-        function.checkDoDefine(token)
+        message=function.checkDoDefine(token)
+        return message
 
-    def checkDoDefineFunction(self, token):  # 调用函数时候检查函数是否定义
-        if token.val not in self.globalNameList:
-            raise ValueError('error variable no definition in line ',
-                             token.cur_line + 1, token.val)
+
+    def checkFunction(self,RES_TOKEN, id):  # 调用函数时候检查函数是否定义
+        if RES_TOKEN[id].val not in self.globalNameList:
+            ErrorType = 'Unknown identifier'
+            Location = 'Location:line {line}'.format(line=RES_TOKEN[id].cur_line)
+            ErrorMessage = "variable '{token}' has no definition".format(token=RES_TOKEN[id].val)
+            return Message(ErrorType,Location,ErrorMessage)
+        else:
+            temp_token = RES_TOKEN[id]
+            para_num = 0
+            while temp_token.val != ")":
+                if temp_token.val == "(":
+                    para_num = -1
+                if (temp_token.val != ','):
+                    para_num += 1;
+                temp_token = RES_TOKEN[temp_token.id + 1]
+            i=self.functionNameList.index(RES_TOKEN[id].val)
+            fun = self.functionList[i]
+            if (fun.numOfParameters != para_num):
+                ErrorType = 'function argument number'
+                Location = 'Location:line {line}'.format(line=RES_TOKEN[id].cur_line)
+                ErrorMessage = "too many or too few arguement in function '{function}'".format(function=RES_TOKEN[id].val)
+                return Message(ErrorType, Location, ErrorMessage)
+            return Message(None,None,None)
+
 
     def showTheInfo(self):  # 打印符号表的信息
         symbolTableInfoStr=[]
