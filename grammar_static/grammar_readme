@@ -23,6 +23,8 @@
 | LoopStatement | 循环语句 | VN |
 | FuncCall | 函数调用 | VN |
 | Args| 参数 | VN|
+| Struct | 结构体 |VN
+|st | 结构体变量定义的时候规约使用 |VT 
 
 ## Main Function
 + 函数定义
