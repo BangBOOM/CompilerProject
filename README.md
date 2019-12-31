@@ -19,4 +19,16 @@ NEU编译原理课设
 + 2019-12-18
     + 四元式转目标代码
     + 目标代码跳转信息填写
-+ 程序入口在clikecompiler.py中
+
+
+## 文件介绍：
++ `lexer.py` 词法分析
++ `grammarParaser.py` 生成LL1分析表
++ `grammar.py` LL1语法分析，同时填写符号表，产生报错信息
++ `symbol_table.py` 符号表
++ `qt_gen.py` 四元式生成
++ `optimization.py` 四元式划分基本块，DAG优化
++ `asm_gen_x.py` 目标代码生成
+  + 计算活跃信息，位置信息
+  + 生成汇编代码过程中添加跳转信息
++ `clikercompiler.py` 程序入口
