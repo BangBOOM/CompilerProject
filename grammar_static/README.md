@@ -1,5 +1,5 @@
 # The Grammar of C_Like_Language
-
+整个文法定义在`c_like_grammar`这个文件中，其中的一些定义如下。
 ## Some Definition
 | Name | Mean | Type |
 | :------| :------ | :------ |
