@@ -15,11 +15,11 @@ class Lexer:
     TokenList = []
     CUR_ROW = -1
     CUR_LINE = 0
-    id=-1
+    id = -1
     Token = namedtuple('Token', 'type index val cur_line id')  # 具名元组表示
 
     def __incId(self):
-        self.id+=1
+        self.id += 1
         return self.id
 
     def __init__(self):
@@ -72,7 +72,7 @@ class Lexer:
             return "END"
         elif item.isalpha() or item == '_':
             demo = ""
-            while item.isalpha() or item.isdigit() or item in ['_','.','[',']']:
+            while item.isalpha() or item.isdigit() or item in ['_', '.', '[', ']']:
                 demo += item
                 if self.CUR_ROW == len(self.INPUT[self.CUR_LINE]) - 1:
                     self.CUR_LINE += 1
@@ -126,7 +126,7 @@ class Lexer:
                 id = self.__getId(demo, 'p')
                 self.backOneStep()
             typ = 'p'
-        return self.Token(typ, id, demo, self.CUR_LINE,self.__incId())
+        return self.Token(typ, id, demo, self.CUR_LINE, self.__incId())
 
     def analyse(self):
         TOKEN_LIST = []
@@ -140,6 +140,7 @@ class Lexer:
         return TOKEN_LIST
 
 
+'''
 if __name__ == "__main__":
     lex = Lexer()
     path = os.path.abspath('c_input')
@@ -150,7 +151,4 @@ if __name__ == "__main__":
     res = lex.analyse()
     for tmp in res:
         print(tmp)
-
-'''
-这部分需要添加遇到非法符号报错，即遇到未出现在p_list中的符号终止程序返回错误信息
 '''

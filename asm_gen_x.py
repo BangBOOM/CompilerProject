@@ -1,5 +1,5 @@
 from collections import namedtuple
-import re
+
 
 class AsmCodeGen:
     qtx = namedtuple('qtx', 'val actInfo addr1 addr2 dosePointer ')  # 变量名 活跃信息 一级地址相对于函数 二级地址相对于结构体数组 是否是指针
@@ -19,45 +19,44 @@ class AsmCodeGen:
     def __init__(self, sym, allCode):
         self.symTable = sym  # 符号表传入
         self.allCode = allCode  # 优化后的代码传入
-        self.allAsmCode=[]     # 目标代码的头部
-        self.funcsAsmCode=[]    # 所有函数块的目标代码
-        self.mainAsmCode=[]        # 主函数目标代码
+        self.allAsmCode = []  # 目标代码的头部
+        self.funcsAsmCode = []  # 所有函数块的目标代码
+        self.mainAsmCode = []  # 主函数目标代码
         for funcBlock in self.allCode:
             self.getAsm(funcBlock)
         self.getAll()
         # for item in self.allAsmCode:
         #     print(item)
 
-
     def getAll(self):
         for struct in self.symTable.structList:
-            self.allAsmCode.append("%s STRUCT"%struct.structName)
-            for k,v in struct.variableDict.items():
-                if v.type=='int':
-                    self.allAsmCode.append("%s dw ?"%k)
-                if v.type=='array':
-                    n,m=k.split('[')
-                    m,_=m.split(']')
-                    self.allAsmCode.append("%s dw %s DUP (0)"%(n,m))
-            self.allAsmCode.append("%s ENDS"%struct.structName)
+            self.allAsmCode.append("%s STRUCT" % struct.structName)
+            for k, v in struct.variableDict.items():
+                if v.type == 'int':
+                    self.allAsmCode.append("%s dw ?" % k)
+                if v.type == 'array':
+                    n, m = k.split('[')
+                    m, _ = m.split(']')
+                    self.allAsmCode.append("%s dw %s DUP (0)" % (n, m))
+            self.allAsmCode.append("%s ENDS" % struct.structName)
         self.allAsmCode.append("DSEG SEGMENT")
-        mainSYM=self.symTable.symDict['main']
-        for k,v in mainSYM.variableDict.items():
-            if v.type=='int':
-                self.allAsmCode.append("%s dw ?"%k)
+        mainSYM = self.symTable.symDict['main']
+        for k, v in mainSYM.variableDict.items():
+            if v.type == 'int':
+                self.allAsmCode.append("%s dw ?" % k)
             elif v.type == 'array':
                 n, m = k.split('[')
                 m, _ = m.split(']')
                 self.allAsmCode.append("%s dw %s DUP (0)" % (n, m))
             else:
-                self.allAsmCode.append("%s %s <?>"%(k,v.type))
+                self.allAsmCode.append("%s %s <?>" % (k, v.type))
         self.allAsmCode.append("DSEG ENDS")
-        self.allAsmCode+=[
+        self.allAsmCode += [
             "SSEG SEGMENT STACK",
             "STK DB	40 DUP (0)",
             "SSEG ENDS",
         ]
-        self.allAsmCode+=[
+        self.allAsmCode += [
             "CSEG SEGMENT",
             "ASSUME CS:CSEG,DS:DSEG,SS:SSEG"
         ]
@@ -70,7 +69,6 @@ class AsmCodeGen:
                 for i in item:
                     self.allAsmCode.append(i)
 
-
     def getAsm(self, funcBlock):
 
         '''
@@ -79,53 +77,52 @@ class AsmCodeGen:
         :return:
         '''
         funcName = funcBlock[0][0][1]
-        if funcName != 'main':  #函数部分的目标代码生成
-            for bloc in funcBlock:  #对所有代码块添加活跃信息
+        if funcName != 'main':  # 函数部分的目标代码生成
+            for bloc in funcBlock:  # 对所有代码块添加活跃信息
                 self.actFunInfoGen(bloc, funcName)
-            res=self.genFunAsm(funcBlock, funcName)
+            res = self.genFunAsm(funcBlock, funcName)
             self.funcsAsmCode.append(res)
             '''打印一个函数的目标代码'''
             # for item in res:
             #     for i in item:
             #         print(i)
-                # print('\n')
-        else:   #主函数目标代码
+            # print('\n')
+        else:  # 主函数目标代码
             '''主函数中的变量会添加到DATA段临时变量会放入栈中'''
             for bloc in funcBlock:
-                self.actFunInfoGen(bloc,funcName)
-            res=self.genMainAsm(funcBlock,funcName)
+                self.actFunInfoGen(bloc, funcName)
+            res = self.genMainAsm(funcBlock, funcName)
             self.mainAsmCode.append(res)
 
-
-
-    def genMainAsm(self,funcBlock,funcName):
+    def genMainAsm(self, funcBlock, funcName):
         '''
         生成主函数的目标代码
         '''
-        funcTable=self.symTable.symDict[funcName]
+        funcTable = self.symTable.symDict[funcName]
+
         def LD(x):
-            res=[]
-            if x.val in list(funcTable.variableDict.keys()):    #特殊情况传地址的时候使用
+            res = []
+            if x.val in list(funcTable.variableDict.keys()):  # 特殊情况传地址的时候使用
                 if funcTable.variableDict[x.val].type in self.symTable.structNameList:
-                    res.append("MOV AX,OFFSET %s"%x.val)
+                    res.append("MOV AX,OFFSET %s" % x.val)
                     return res
 
             if x.val.isdigit():  # x是立即数
                 res.append("MOV AX,%s" % x.val)
             elif x.val.startswith('@'):
-                res.append("MOV AX,SS:[BP-%d]"%x.addr1)
+                res.append("MOV AX,SS:[BP-%d]" % x.addr1)
             elif '[' in x.val:
-                t,n=x.split('[')
-                n,_=n.split(']')
-                n=eval(n)
-                res.append("MOV BX,OFFSET %s"%t)
-                res.append("MOV AX,DS:[BX+%d]"%(n*2))
+                t, n = x.split('[')
+                n, _ = n.split(']')
+                n = eval(n)
+                res.append("MOV BX,OFFSET %s" % t)
+                res.append("MOV AX,DS:[BX+%d]" % (n * 2))
             else:
-                res.append("MOV AX,%s"%x.val)
+                res.append("MOV AX,%s" % x.val)
             return res
 
         def ST(x):
-            res=[]
+            res = []
             if x.val.startswith('@'):
                 res.append("MOV SS:[BP-%d],AX" % x.addr1)
             elif '[' in x.val:
@@ -138,9 +135,8 @@ class AsmCodeGen:
                 res.append("MOV %s,AX" % x.val)
             return res
 
-
-        def DOP(x,y):
-            res=[]
+        def DOP(x, y):
+            res = []
             if x.val in ['<', '<=', '>', '>=', '==']:
                 if y.val.isdigit():
                     res.append("CMP AX,%s" % y.val)
@@ -149,12 +145,12 @@ class AsmCodeGen:
                     n, _ = n.split(']')
                     n = eval(n)
                     res.append("MOV BX,OFFSET %s" % t)
-                    res.append("CMP AX,DS:[BX+%d]" %(n*2))
+                    res.append("CMP AX,DS:[BX+%d]" % (n * 2))
                 else:
-                    res.append("CMP AX,%s"%y.val)
+                    res.append("CMP AX,%s" % y.val)
                 res.append("%s " % self.op2asm[x.val])
 
-            elif x.val in ['+','-']:
+            elif x.val in ['+', '-']:
                 if y.val.isdigit():
                     res.append("%s AX,%s" % (self.op2asm[x.val], y.val))
                 elif '[' in y.val:
@@ -162,10 +158,10 @@ class AsmCodeGen:
                     n, _ = n.split(']')
                     n = eval(n)
                     res.append("MOV BX,OFFSET %s" % t)
-                    res.append("%s AX,DS:[BX+%d]" %(self.op2asm[x.val],n*2))
+                    res.append("%s AX,DS:[BX+%d]" % (self.op2asm[x.val], n * 2))
                 else:
-                    res.append("%s AX,%s"%(self.op2asm[x.val],y.val))
-            elif x.val in ['*','/']:
+                    res.append("%s AX,%s" % (self.op2asm[x.val], y.val))
+            elif x.val in ['*', '/']:
                 if y.val.isdigit():
                     res.append("%s %s" % (self.op2asm[x.val], y.val))
                 elif '[' in y.val:
@@ -173,9 +169,9 @@ class AsmCodeGen:
                     n, _ = n.split(']')
                     n = eval(n)
                     res.append("MOV BX,OFFSET %s" % t)
-                    res.append("%s DS:[BX+%d]" %(self.op2asm[x.val],n*2))
+                    res.append("%s DS:[BX+%d]" % (self.op2asm[x.val], n * 2))
                 else:
-                    res.append("%s %s"%(self.op2asm[x.val],y.val))
+                    res.append("%s %s" % (self.op2asm[x.val], y.val))
 
             return res
 
@@ -263,7 +259,7 @@ class AsmCodeGen:
                     codes.append("CALL %s" % item[1].val)
                 elif item[0].val == 'callr':
                     codes.append("CALL %s" % item[1].val)
-                    codes+= ST(item[-1])
+                    codes += ST(item[-1])
                 elif item[0].val == 'FUN':
                     codes.append("%s:" % item[1].val)
                     codes.append("MOV BP,SP")
@@ -282,7 +278,6 @@ class AsmCodeGen:
 
             asmCode.append(codes)
         return asmCode
-
 
     def genFunAsm(self, funcBlock, funcName):
         '''
@@ -316,7 +311,7 @@ class AsmCodeGen:
                         res.append("CMP AX,SS:[BP+%d-%d]" % (abs(y.addr1), y.addr2))
                     else:
                         res.append("CMP AX,SS:[BP-%d-%d]" % (y.addr1, y.addr2))
-                res.append("%s "%self.op2asm[x.val])
+                res.append("%s " % self.op2asm[x.val])
 
             elif x.val in ['+', '-']:
                 if y.val.isdigit():
@@ -408,12 +403,12 @@ class AsmCodeGen:
                                 codes += ST(RDL)
                             codes += LD(item[1])
                     else:
-                        codes+=LD(item[1])
+                        codes += LD(item[1])
                     codes.append("MOV SP,BP")
                     codes.append("POP BP")
                     numOfPar = self.symTable.symDict[funcName].numOfParameters
                     codes.append("RET %d" % (numOfPar * 2))
-                    codes.append("%s ENDP"%funcName)
+                    codes.append("%s ENDP" % funcName)
 
                 elif item[0].val == 'continue':
                     if RDL and RDL.actInfo:
@@ -458,7 +453,7 @@ class AsmCodeGen:
                     codes.append("CALL %s" % item[1].val)
                 elif item[0].val == 'callr':
                     codes.append("CALL %s" % item[1].val)
-                    codes+= ST(item[-1])
+                    codes += ST(item[-1])
 
             asmCode.append(codes)
         return asmCode
@@ -473,8 +468,8 @@ class AsmCodeGen:
         actTable = {}
         funcTable = self.symTable.symDict[funcName]  # 获取对应函数的符号表
         maxSizeOfFunc = funcTable.totalSize
-        if funcName=='main':
-            maxSizeOfFunc=0
+        if funcName == 'main':
+            maxSizeOfFunc = 0
         t_table = {}  # 临时变量栈地址存放
         for tmp in bloc:
             for item in tmp[1:]:
@@ -493,8 +488,8 @@ class AsmCodeGen:
             if x.startswith('@'):
                 res = self.qtx(x, actTable[x], t_table[x] + 2, 0, False)
             else:
-                if funcName=='main':
-                    res=self.qtx(x,actTable[x],None,None,None)
+                if funcName == 'main':
+                    res = self.qtx(x, actTable[x], None, None, None)
                 else:
                     if '.' in x:
                         x1, x2 = x.split('.')  # x1结构体 x2结构体中的变量
@@ -527,13 +522,8 @@ class AsmCodeGen:
                 actTable[tmp[-2].val] = True
             tmp[0] = self.qtx(tmp[0], None, None, None, None)
 
-        '''打印添加活跃信息后的情况'''
-        # for x in bloc:
-        #     for y in x:
-        #         print(y)
-        #     print('-'*20)
-        # print('\n\n')
 
+'''
 
 from grammar import LL1
 from qt_gen import QtGen
@@ -566,6 +556,8 @@ if __name__ == '__main__':
             print('-' * 30)
 
         asm = AsmCodeGen(ll1.syn_table, qtListAfterOpt)
+
+'''
 
 '''
 函数中:

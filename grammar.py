@@ -6,6 +6,7 @@ from collections import namedtuple
 
 Message = namedtuple('Message', 'ErrorType Location ErrorMessage')
 
+
 class LL1(GrammarParser):
     RES_TOKEN = []
     syn_table = symbol_table.SYMBOL()
@@ -64,17 +65,13 @@ class LL1(GrammarParser):
                     tmp = list(tmp)
                     stack += tmp[::-1]
                     message = self.editSymTable(x, w, token)
-                    # try:
                     if message.ErrorType != None:
                         return message
-                    # except:
-                    #     pass
             else:
                 if w == '#':
                     self.funcBlocks.append(funcBlock)
                     self.syn_table.showTheInfo()
                     return ('acc', None, None)
-                    # return "acc"
                 try:
                     token = TokenList.pop(0)
                     if stack[-1] == 'Funcs':  # 将函数定义
@@ -130,7 +127,7 @@ class LL1(GrammarParser):
         message = Message(None, None, None)
         return message
 
-
+'''
 if __name__ == '__main__':
     grammar_path = os.path.abspath('grammar_static/c_like_grammar')
     path = os.path.abspath('c_input')
@@ -141,3 +138,4 @@ if __name__ == '__main__':
     res = ll1.analyzeInputString()
     print(res)
     ll1.syn_table.showTheInfo()
+'''

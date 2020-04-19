@@ -1,47 +1,39 @@
 import copy
 from collections import namedtuple
+
 '''
 四元式的优化
 '''
 
-class Optimization:
-    def __init__(self,sym):
-        self.symTable=sym       #符号表
 
-    def opt(self,funcBlock):    #每次传入一个函数块，把这个函数块分成基本块并优化
-        fBlock=copy.copy(funcBlock)
-        res=[]         #二维 res[bloc bloc]
-        bloc=[]        #存放基本块
+class Optimization:
+    def __init__(self, sym):
+        self.symTable = sym  # 符号表
+
+    def opt(self, funcBlock):  # 每次传入一个函数块，把这个函数块分成基本块并优化
+        fBlock = copy.copy(funcBlock)
+        res = []  # 二维 res[bloc bloc]
+        bloc = []  # 存放基本块
         while fBlock:
-            tmp=fBlock.pop(0)
+            tmp = fBlock.pop(0)
             if tmp[0] in ['wh']:
                 res.append(bloc)
-                bloc=[tmp]
-            elif tmp[0] in ['do','we','if','el','elif','ie','return','continue','break']:
+                bloc = [tmp]
+            elif tmp[0] in ['do', 'we', 'if', 'el', 'elif', 'ie', 'return', 'continue', 'break']:
                 bloc.append(tmp)
                 res.append(bloc)
-                bloc=[]
-            elif tmp[0]=="FUN":
+                bloc = []
+            elif tmp[0] == "FUN":
                 res.append([tmp])
             else:
                 bloc.append(tmp)
-        funcBlock_new=[]
+        funcBlock_new = []
         for b in res:
-            # print("----old----")
-            # for i in b:
-            #     print(i)
-            # print("----old----")
-            self.optTheBloc(b)
-            # print("----new----")
-            # for i in self.new_qt:
-            #     print(i)
-            # print("----new----")
-            # print("\n\n")
+            self.optTheBloc(b)  # 优化基本块
             funcBlock_new.append(self.new_qt)
-        return  funcBlock_new
+        return funcBlock_new
 
-
-    def optTheBloc(self,bloc):
+    def optTheBloc(self, bloc):
         '''
         这部分对基本块进行优化
         :param bloc:
@@ -50,7 +42,7 @@ class Optimization:
         self.nodes = []
         self.new_qt = []
         self.NODE = namedtuple('NODE', 'op ID signs leftNodeID rightNodeID')
-        self.operation=['+', '-', '*', '/', '=','>','<','==','>=','<=']
+        self.operation = ['+', '-', '*', '/', '=', '>', '<', '==', '>=', '<=']
         for qt in bloc:  # 假设四元式为（op,B,C,A)
             "构造DOG"
 
@@ -61,7 +53,7 @@ class Optimization:
                     self.add_to_node(idB, qt[3])
                 else:
                     if qt[1].isdigit() and qt[2].split('.')[-1].isdigit():
-                        idP=self.Get_NODE(str(int(eval(qt[1]+qt[0]+qt[2]))))
+                        idP = self.Get_NODE(str(int(eval(qt[1] + qt[0] + qt[2]))))
                         self.delete_sym(qt[3])
                         self.add_to_node(idP, qt[3])
                     else:
@@ -79,14 +71,13 @@ class Optimization:
 
             if qt[0] not in self.operation:  # 最后一个才可能不是运算四元式
 
-                if flag==1:
+                if flag == 1:
                     self.new_qt.append(qt)  # 这部分不需要优化
                 else:
-                    self.new_qt.insert(i,qt)
-                    i=i+1
+                    self.new_qt.insert(i, qt)
+                    i = i + 1
             else:
-                flag=1
-
+                flag = 1
 
     def Get_NODE(self, sym, BofLeftNodeID=None, CofRightNodeID=None):
         "如果存在一个结点含有sym则返回结点id；如果不存在，创一个新结点，对其编号并且返回它的id(sym 可能是操作数或操作符)"
@@ -147,21 +138,10 @@ class Optimization:
 
     def add_to_node(self, nodeID, sym):
         "将sym附加到结点"
-        if len(self.nodes[nodeID].signs) != 0 and self.nodes[nodeID].signs[0][0] == '@' and sym[0] != '@':  # 主标记为临时变量就交换位置
+        if len(self.nodes[nodeID].signs) != 0 and self.nodes[nodeID].signs[0][0] == '@' and sym[
+            0] != '@':  # 主标记为临时变量就交换位置
             tmp = self.nodes[nodeID].signs[0]
             self.nodes[nodeID].signs[0] = sym
             self.nodes[nodeID].signs.append(tmp)
         else:
             self.nodes[nodeID].signs.append(sym)
-
-
-
-
-
-
-
-
-
-
-
-

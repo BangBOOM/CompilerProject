@@ -1,4 +1,5 @@
-import os,json
+import os, json
+
 
 class GrammarParser:
     GRAMMAR_DICT = {}
@@ -11,15 +12,16 @@ class GrammarParser:
     Z = None
     SELECT = []
     analysis_table = {}
-    def __init__(self,path=None):
+
+    def __init__(self, path=None):
         if not path:
-            path=os.path.abspath('grammar_static/c_like_grammar')
+            path = os.path.abspath('grammar_static/c_like_grammar')
         with open(path, 'r', encoding='utf-8') as f:
             for item in f.readlines():
                 vn, tmp = item.strip().split('->')
                 if not self.Z:
-                    self.Z=vn
-                tmp=tmp.split(' ')
+                    self.Z = vn
+                tmp = tmp.split(' ')
                 self.P_LIST.append((vn, tmp))
                 self.GRAMMAR_DICT.setdefault(vn, []).append(tmp)
                 self.VN.add(vn)
@@ -28,16 +30,15 @@ class GrammarParser:
                 if x not in self.VN and x != '$':
                     self.VT.add(x)
 
-
     def initList(self):
         self._calFirstvt()
         self._calFirst()
         self._calFollow()
         self._calSelect()
         self._calAnalysisTable()
-        path=os.path.abspath('grammar_static/AnalysisTable.json')
-        with open(path,'w') as f:
-            json.dump(self.analysis_table,f)
+        path = os.path.abspath('grammar_static/AnalysisTable.json')
+        with open(path, 'w') as f:
+            json.dump(self.analysis_table, f)
 
     def _calFirstvt(self):
         def helper(vn):
@@ -71,18 +72,19 @@ class GrammarParser:
             self.FIRST.append(demo)
 
     def _calFollow(self):
-        state=dict(zip(list(self.VN),[False]*len(self.VN)))
+        state = dict(zip(list(self.VN), [False] * len(self.VN)))
+
         def helper(vn):
-            if state[vn]==True:
+            if state[vn] == True:
                 return
-            for x,item in self.P_LIST:
+            for x, item in self.P_LIST:
                 try:
                     id = item.index(vn)
                     follow = self.FOLLOW.setdefault(vn, set())
                     while True:
                         if id + 1 == len(item):
                             follow.add('#')
-                            if x!=vn and not state[x]:
+                            if x != vn and not state[x]:
                                 helper(x)
                             follow.update(self.FOLLOW[x])
                         elif item[id + 1] in self.VT:
@@ -95,12 +97,13 @@ class GrammarParser:
                         break
                 except:
                     pass
-            state[vn]=True
+            state[vn] = True
+
         for vn in self.VN:
             helper(vn)
 
     def _calSelect(self):
-        for p,f in zip(self.P_LIST,self.FIRST):
+        for p, f in zip(self.P_LIST, self.FIRST):
             if f:
                 self.SELECT.append(f)
             else:
@@ -108,7 +111,7 @@ class GrammarParser:
 
     def _calAnalysisTable(self):
         for vn in self.VN:
-            self.analysis_table[vn]=dict([(vt,-1) for vt in self.VT]+[('#',-1)])
-        for i,item in enumerate(self.P_LIST):
+            self.analysis_table[vn] = dict([(vt, -1) for vt in self.VT] + [('#', -1)])
+        for i, item in enumerate(self.P_LIST):
             for x in self.SELECT[i]:
-                self.analysis_table[item[0]][x]=i
+                self.analysis_table[item[0]][x] = i
