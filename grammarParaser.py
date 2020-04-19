@@ -30,16 +30,16 @@ class GrammarParser:
 
 
     def initList(self):
-        self.__calFirstvt()
-        self.__calFirst()
-        self.__calFollow()
-        self.__calSelect()
-        self.__calAnalysisTable()
+        self._calFirstvt()
+        self._calFirst()
+        self._calFollow()
+        self._calSelect()
+        self._calAnalysisTable()
         path=os.path.abspath('grammar_static/AnalysisTable.json')
         with open(path,'w') as f:
             json.dump(self.analysis_table,f)
 
-    def __calFirstvt(self):
+    def _calFirstvt(self):
         def helper(vn):
             fir = self.FIRST_VT.setdefault(vn, set([]))
             if not fir:
@@ -57,7 +57,7 @@ class GrammarParser:
         for vn in self.VN:
             helper(vn)
 
-    def __calFirst(self):
+    def _calFirst(self):
         for _, item in self.P_LIST:
             demo = set([])
             for i in item:
@@ -70,7 +70,7 @@ class GrammarParser:
                 break
             self.FIRST.append(demo)
 
-    def __calFollow(self):
+    def _calFollow(self):
         state=dict(zip(list(self.VN),[False]*len(self.VN)))
         def helper(vn):
             if state[vn]==True:
@@ -99,14 +99,14 @@ class GrammarParser:
         for vn in self.VN:
             helper(vn)
 
-    def __calSelect(self):
+    def _calSelect(self):
         for p,f in zip(self.P_LIST,self.FIRST):
             if f:
                 self.SELECT.append(f)
             else:
                 self.SELECT.append(self.FOLLOW[p[0]])
 
-    def __calAnalysisTable(self):
+    def _calAnalysisTable(self):
         for vn in self.VN:
             self.analysis_table[vn]=dict([(vt,-1) for vt in self.VT]+[('#',-1)])
         for i,item in enumerate(self.P_LIST):
