@@ -1,5 +1,7 @@
 # CompilerProject
-NEU编译原理课设基于LL1文法,最终展示是用Django搭建的网站形式，本仓库不包含网页代码。
+NEU编译原理课设基于LL1文法，实现类C语言代码到汇编代码的生成
+
+最终展示是用Django搭建的网站形式，本仓库不包含网页代码。
 
 [网站链接](https://justyan.top/compiler/index)
 
