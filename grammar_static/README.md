@@ -38,4 +38,4 @@
 + 函数传参不支持算术表达式
 
 ## Translation Grammar
-+ 翻译文法用于翻译一整个函数，基于LL1文法添加语义
++ 翻译文法用于翻译一整个函数，基于LL1文法添加语义，具体内容见文件`translation_grammar`
