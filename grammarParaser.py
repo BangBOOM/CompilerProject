@@ -77,13 +77,14 @@ class GrammarParser:
         def helper(vn):
             if state[vn] == True:
                 return
-            for x, item in self.P_LIST:
+            for idx, (x, item) in enumerate(self.P_LIST):
                 try:
                     id = item.index(vn)
                     follow = self.FOLLOW.setdefault(vn, set())
                     while True:
                         if id + 1 == len(item):
-                            follow.add('#')
+                            if idx == 0:
+                                follow.add('#')
                             if x != vn and not state[x]:
                                 helper(x)
                             follow.update(self.FOLLOW[x])
